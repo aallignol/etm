@@ -1,0 +1,3 @@
+useDynLib(etm3)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
