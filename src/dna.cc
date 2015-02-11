@@ -30,18 +30,17 @@ RcppExport SEXP dna(SEXP _times,
     cube dna(nstate, nstate, lt); dna.zeros();
 
     for (int t=0; t < lt; ++t) {
+	mat tmp(dna.slice(t).begin(), nstate, nstate, false);
+	mat dn(nev.slice(t).begin(), nstate, nstate, false);
+	mat y(nrisk.slice(t).begin(), nstate, nstate, false);
 	for (int i=0; i < n; ++i) {
 	    if (entry[i] < times[t] && exit[i] >= times[t])
-	    	nrisk.slice(t).row(from[i] - 1) += 1;
+	    	y.row(from[i] - 1) += 1;
 	    if (exit[i] == times[t] && to[i] != 0)
-	    	nev.at(from[i] - 1, to[i] - 1, t) += 1;
+	    	dn.at(from[i] - 1, to[i] - 1) += 1;
 	}
-	    
-	// mat n = conv_to<mat>::from(nev.slice(t));
-	// mat y = conv_to<mat>::from(nrisk.slice(t));
-	mat tmp(dna.slice(t).begin(), nstate, nstate, false);
 	
-	tmp = nev.slice(t) / nrisk.slice(t);
+	tmp = dn / y;
 	tmp.elem(find_nonfinite(tmp)).zeros();
 	vec d = sum(tmp, 1);
 	tmp.diag() = -d;
