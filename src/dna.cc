@@ -36,16 +36,17 @@ RcppExport SEXP dna(SEXP _times,
 	    	nrisk.slice(t).row(from[i] - 1) += 1;
 	    if (exit[i] == times[t] && to[i] != 0)
 	    	nev.at(from[i] - 1, to[i] - 1, t) += 1;
-	    
-	    mat n = conv_to<mat>::from(nev.slice(t));
-	    mat y = conv_to<mat>::from(nrisk.slice(t));
-	    mat tmp(dna.slice(t).begin(), nstate, nstate, false);
-
-	    tmp = n / y;
-	    tmp.elem(find_nonfinite(tmp)).zeros();
-	    vec d = sum(tmp, 1);
-	    tmp.diag() = -d;
 	}
+	    
+	mat n = conv_to<mat>::from(nev.slice(t));
+	mat y = conv_to<mat>::from(nrisk.slice(t));
+	mat tmp(dna.slice(t).begin(), nstate, nstate, false);
+	
+	tmp = n / y;
+	tmp.elem(find_nonfinite(tmp)).zeros();
+	vec d = sum(tmp, 1);
+	tmp.diag() = -d;
+	
     }
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = nrisk,
