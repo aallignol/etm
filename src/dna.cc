@@ -1,6 +1,6 @@
 #include <RcppArmadillo.h>
 
-using namespace std;
+// using namespace std;
 using namespace arma;
 
 RcppExport SEXP dna(SEXP _times,
@@ -13,17 +13,12 @@ RcppExport SEXP dna(SEXP _times,
 {
 
 
-    Rcpp::NumericVector __entry(_entry), __exit(_exit), __times(_times);
-    Rcpp::IntegerVector __from(_from), __to(_to);
-    vec times(__times.begin(), __times.size(), false);
-    vec entry(__entry.begin(), __entry.size(), false);
-    vec exit(__exit.begin(), __exit.size(), false);
-    ivec from(__from.begin(), __from.size(), false);
-    ivec to(__to.begin(), __to.size(), false);
+    Rcpp::NumericVector entry(_entry), exit(_exit), times(_times);
+    Rcpp::IntegerVector from(_from), to(_to);
 
-    int lt = times.size();
-    int n = entry.size();
-    int nstate = Rcpp::as<int>(_nstate);
+    const int lt = times.size();
+    const int n = entry.size();
+    const int nstate = Rcpp::as<int>(_nstate);
 
     // define the matrices we need
     icube nrisk(nstate, nstate, lt); nrisk.zeros();
@@ -46,7 +41,6 @@ RcppExport SEXP dna(SEXP _times,
 	tmp.elem(find_nonfinite(tmp)).zeros();
 	vec d = sum(tmp, 1);
 	tmp.diag() = -d;
-	
     }
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = nrisk,
