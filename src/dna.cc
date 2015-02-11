@@ -46,7 +46,7 @@ RcppExport SEXP dna(SEXP _times,
 	tmp.diag() = -d;
     }
 
-    cube est = prodint(dna, nstate, lt);
+    cube est = prodint(dna, nstate);
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = nrisk,
 			      Rcpp::Named("n.event") = nev,
