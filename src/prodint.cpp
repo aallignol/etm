@@ -2,11 +2,10 @@
 
 using namespace arma;
 
-cube prodint(cube & dna, int nstate) {
+cube prodint(cube & dna, int nstate, int ltimes) {
 
     cube aj(dna.begin(), nstate, nstate, ltimes);
     mat I = eye<mat>(nstate, nstate);
-    const int ltimes = dna.n_slices;
 
     aj.slice(0) = aj.slice(0) + I;
 

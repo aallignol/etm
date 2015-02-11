@@ -23,6 +23,7 @@ RcppExport SEXP dna(SEXP _times,
     const int lt = times.size();
     const int n = entry.size();
     const int nstate = Rcpp::as<int>(_nstate);
+    const int cova = Rcpp::as<int>(_covariance);
 
     // define the matrices we need
     cube nrisk(nstate, nstate, lt); nrisk.zeros();
@@ -30,12 +31,15 @@ RcppExport SEXP dna(SEXP _times,
     cube dna(nstate, nstate, lt); dna.zeros();
 
     for (int t=0; t < lt; ++t) {
+	
 	mat tmp(dna.slice(t).begin(), nstate, nstate, false);
 	mat dn(nev.slice(t).begin(), nstate, nstate, false);
 	mat y(nrisk.slice(t).begin(), nstate, nstate, false);
+	
 	for (int i=0; i < n; ++i) {
-	    if (entry[i] < times[t] && exit[i] >= times[t])
+	    if (entry[i] < times[t] && exit[i] >= times[t]) {
 	    	y.row(from[i] - 1) += 1;
+	    }
 	    if (exit[i] == times[t] && to[i] != 0)
 	    	dn.at(from[i] - 1, to[i] - 1) += 1;
 	}
@@ -46,7 +50,7 @@ RcppExport SEXP dna(SEXP _times,
 	tmp.diag() = -d;
     }
 
-    cube est = prodint(dna, nstate);
+    cube est = prodint(dna, nstate, lt);	
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = nrisk,
 			      Rcpp::Named("n.event") = nev,
