@@ -5,17 +5,18 @@ using namespace arma;
 
 cube prodint(cube & dna, int nstate, int ltimes);
 
-//ProfilerStart("/tmp/output.log")
 
-RcppExport SEXP dna(SEXP _times,
-		    SEXP _entry,
-		    SEXP _exit,
-		    SEXP _from,
-		    SEXP _to,
-		    SEXP _nstate)
+
+RcppExport SEXP gen_msm(SEXP _times,
+			SEXP _entry,
+			SEXP _exit,
+			SEXP _from,
+			SEXP _to,
+			SEXP _nstate)
 
 {
 
+    
 
     Rcpp::NumericVector entry(_entry), exit(_exit), times(_times);
     Rcpp::IntegerVector from(_from), to(_to);
@@ -23,13 +24,14 @@ RcppExport SEXP dna(SEXP _times,
     const int lt = times.size();
     const int n = entry.size();
     const int nstate = Rcpp::as<int>(_nstate);
-    const int cova = Rcpp::as<int>(_covariance);
+    //const int cova = Rcpp::as<int>(_covariance);
 
     // define the matrices we need
     cube nrisk(nstate, nstate, lt); nrisk.zeros();
     cube nev(nstate, nstate, lt); nev.zeros();
     cube dna(nstate, nstate, lt); dna.zeros();
-
+//    ProfilerStart("/tmp/gen_msm.prof");
+    
     for (int t=0; t < lt; ++t) {
 	
 	mat tmp(dna.slice(t).begin(), nstate, nstate, false);
@@ -51,6 +53,7 @@ RcppExport SEXP dna(SEXP _times,
     }
 
     cube est = prodint(dna, nstate, lt);	
+//    ProfilerStop();
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = nrisk,
 			      Rcpp::Named("n.event") = nev,
@@ -59,4 +62,4 @@ RcppExport SEXP dna(SEXP _times,
 	
 }
 	
-//ProfilerStop() 
+

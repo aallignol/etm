@@ -12,7 +12,7 @@
 
     times <- sort(unique(exit[to != 0]))
 
-    zzz <- .Call("dna", times, entry, exit, from, to, nstate)
+    zzz <- .Call("gen_msm", times, entry, exit, from, to, nstate)
     zzz
 }
     
