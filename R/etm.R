@@ -116,14 +116,19 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
             stop("Exit time from a state must be > entry time")
     }
         
-        ## Computation of the risk set and dN
-    ttime <- c(x$entry, x$exit)
-    times <- sort(unique(ttime))
+    ## Computation of the risk set and dN
     x$from <- as.integer(as.character(x$from))
     x$to <- as.integer(as.character(x$to))
-
-    zzz <- .etm(entry = x$entry, exit = x$exit,
-                from = x$from, to = x$to,
+    if (t=="last") t <- max(x$exit)
+    if (!(0 <= s & s < t))
+        stop("'s' and 't' must be positive, and s < t")
+    if (t <= times[1] | s >= times[length(times)])
+        stop("'s' or 't' is an invalid time")
+    
+    zzz <- .etm(entry = x$entry,
+                exit = x$exit,
+                from = x$from,
+                to = x$to,
                 nstate = dim(tra)[1])
 
     zzz         
