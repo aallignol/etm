@@ -23,9 +23,9 @@ cube deltaNA(const cube & nev, const mat & nrisk, int nstate, int ltimes) {
     
     for (int t=0; t < ltimes; ++t) {
 	for (int i=0; i < nstate; ++i) {
-	    for (int j=0; j< nstate; ++j) {
-		if (nrisk.at(i, t) != 0) {
-		    dna.at(i, j, t) = nev.at(i, j, t) / nrisk.at(i, t);
+	    if (nrisk.at(t, i) != 0) {
+		for (int j=0; j< nstate; ++j) {
+		    dna.at(i, j, t) = nev.at(i, j, t) / nrisk.at(t, i);
 		}
 	    }
 	}

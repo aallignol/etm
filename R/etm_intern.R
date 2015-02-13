@@ -4,8 +4,7 @@
 #####################################################################
 
 
-.etm <- function(times, 
-                 entry,
+.etm <- function(entry,
                  exit,
                  from,
                  to,

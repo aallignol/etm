@@ -117,6 +117,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
     }
         
     ## Computation of the risk set and dN
+    times <- sort(unique(x$exit))
     x$from <- as.integer(as.character(x$from))
     x$to <- as.integer(as.character(x$to))
     if (t=="last") t <- max(x$exit)
@@ -129,7 +130,9 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                 exit = x$exit,
                 from = x$from,
                 to = x$to,
-                nstate = dim(tra)[1])
+                nstate = dim(tra)[1],
+                s,
+                t)
 
     zzz         
 }

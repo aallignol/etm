@@ -26,7 +26,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     //const int cova = Rcpp::as<int>(_covariance);
 
     // define the matrices we need
-    mat nrisk(nstate, lt); nrisk.zeros();
+    mat nrisk(lt, nstate); nrisk.zeros();
     cube nev(nstate, nstate, lt); nev.zeros();
 //    ProfilerStart("/tmp/gen_msm.prof");
 
@@ -34,7 +34,7 @@ RcppExport SEXP gen_msm(SEXP _times,
 	for (int t=0; t < lt; ++t) {
 
 	    if (entry[i] < times[t] && exit[i] >= times[t]) {
-		nrisk.at(from[i] - 1, t) += 1;
+		nrisk.at(t, from[i] - 1) += 1;
 	    }
 	    if (exit[i] == times[t] && to[i] != 0) {
 		nev.at(from[i] - 1, to[i] - 1, t) += 1;
