@@ -29,20 +29,18 @@ RcppExport SEXP gen_msm(SEXP _times,
     mat nrisk(lt, nstate); nrisk.zeros();
     cube nev(nstate, nstate, lt); nev.zeros();
 //    ProfilerStart("/tmp/gen_msm.prof");
-
-    for (int i=0; i < n; ++i) {
-	for (int t=0; t < lt; ++t) {
-
-	    if (entry[i] < times[t] && exit[i] >= times[t]) {
-		nrisk.at(t, from[i] - 1) += 1;
-	    }
-	    if (exit[i] == times[t] && to[i] != 0) {
-		nev.at(from[i] - 1, to[i] - 1, t) += 1;
-		break;
-	    }
-	}
+    
+    for (int i = 0; i < n; ++i) {
+    	for (int t=0; t < lt; ++t) {
+    	    if (entry[i] < times[t] && exit[i] >= times[t]) {
+    		nrisk.at(t, from[i] - 1) += 1;
+    	    }
+    	    if (exit[i] == times[t] && to[i] != 0) {
+    		nev.at(from[i] - 1, to[i] - 1, t) += 1;
+    		break;
+    	    }
+    	}
     }
-
 
     cube dna = deltaNA(nev, nrisk, nstate, lt);
     cube est = prodint(dna, nstate, lt);	

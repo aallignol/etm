@@ -125,7 +125,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
         stop("'s' and 't' must be positive, and s < t")
     if (t <= times[1] | s >= times[length(times)])
         stop("'s' or 't' is an invalid time")
-    
+
     zzz <- .etm(entry = x$entry,
                 exit = x$exit,
                 from = x$from,
