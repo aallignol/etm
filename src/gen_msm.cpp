@@ -91,7 +91,8 @@ RcppExport SEXP gen_msm(SEXP _times,
     return Rcpp::List::create(Rcpp::Named("n.risk") = y,
 			      Rcpp::Named("n.event") = nev,
 			      Rcpp::Named("dna") = dna,
-			      Rcpp::Named("est") = est);
+			      Rcpp::Named("est") = est,
+			      Rcpp::Named("time") = times);
 	
 }
 	

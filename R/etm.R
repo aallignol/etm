@@ -134,5 +134,33 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                 s,
                 t)
 
-    zzz         
+
+    nrisk <- zzz$n.risk
+    colnames(nrisk) <- state.names
+    nrisk <- nrisk[, !(colnames(nrisk) %in%
+                       setdiff(unique(trans$to), unique(trans$from))),
+                   drop = FALSE]
+
+    est <- zzz$est
+    nev <- zzz$n.event
+    
+    dimnames(est) <- list(state.names, state.names, zzz$time)
+    dimnames(nev) <- list(state.names, state.names, zzz$time)
+
+    res <- list(model = NULL,
+                est = est,
+                cov = NULL,
+                time = zzz$time,
+                s = s,
+                t = t,
+                trans = trans,
+                tra = tra,
+                state.names = state.names,
+                n.risk = nrisk,
+                n.event = nev,
+                delta.na = zzz$dna,
+                data = x)
+    class(res) <- "etm"
+    
+    res
 }
