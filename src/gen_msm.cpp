@@ -1,5 +1,5 @@
 #include <RcppArmadillo.h>
-//#include <gperftools/profiler.h>
+// #include <gperftools/profiler.h>
 
 using namespace arma;
 
@@ -19,20 +19,25 @@ RcppExport SEXP gen_msm(SEXP _times,
     Rcpp::NumericVector __entry(_entry), __exit(_exit), times(_times);
     Rcpp::IntegerVector __from(_from), __to(_to);
 
+    // ProfilerStart("/tmp/gen_msm.prof");
+    
     vec Tentry(__entry.begin(), __entry.size(), false);
     vec Texit(__exit.begin(), __exit.size(), false);
     ivec Tfrom(__from.begin(), __from.size(), false);
     ivec Tto(__to.begin(), __to.size(), false);
 
-    vec entry(Tentry), exit(Texit);
-    ivec to(Tto), from_entry(Tfrom), from_exit(Tfrom);
+    // vec entry(Tentry), exit(Texit);
+    // ivec to(Tto), from_entry(Tfrom), from_exit(Tfrom);
     
     // do some sorting
     std::sort(times.begin(), times.end());
     uvec ind_entry = sort_index(Tentry);
     uvec ind_exit = sort_index(Texit);
-    entry = Tentry.elem(ind_entry); from_entry = Tfrom.elem(ind_entry);
-    exit = Texit.elem(ind_exit); to = Tto.elem(ind_exit); from_exit = Tfrom.elem(ind_exit);
+    vec entry = Tentry.elem(ind_entry);
+    ivec from_entry = Tfrom.elem(ind_entry);
+    vec exit = Texit.elem(ind_exit);
+    ivec to = Tto.elem(ind_exit);
+    ivec from_exit = Tfrom.elem(ind_exit);
     
     const int lt = times.size();
     const int n = entry.size();
@@ -43,7 +48,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     // define the matrices we need
     mat nrisk(lt, nstate); nrisk.zeros();
     cube nev(nstate, nstate, lt); nev.zeros();
-//    ProfilerStart("/tmp/gen_msm.prof");
+
 
     if (to[0] != 0) nev.at(from_exit[0] - 1, to[0] - 1, 0) += 1;
     nrisk.at(1, from_exit[0] - 1) -= 1;
@@ -81,7 +86,7 @@ RcppExport SEXP gen_msm(SEXP _times,
 	
     cube dna = deltaNA(nev, y, nstate, lt);
     cube est = prodint(dna, nstate, lt);	
-//    ProfilerStop();
+    // ProfilerStop();
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = y,
 			      Rcpp::Named("n.event") = nev,
