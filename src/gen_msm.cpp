@@ -1,3 +1,5 @@
+#define ARMA_NO_DEBUG
+
 #include <RcppArmadillo.h>
 // #include <gperftools/profiler.h>
 
@@ -50,20 +52,22 @@ RcppExport SEXP gen_msm(SEXP _times,
     cube nev(nstate, nstate, lt); nev.zeros();
 
 
-    if (to[0] != 0) nev.at(from_exit[0] - 1, to[0] - 1, 0) += 1;
-    nrisk.at(1, from_exit[0] - 1) -= 1;
-	
+    if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
+    nrisk(1, from_exit[0] - 1) -= 1;
+
     // the events
     int t = 0;
     for (int i = 1; i<n; ++i) {
 	
 	if (exit[i] == exit[i - 1]) {
-	    if (to[i] != 0) nev.at(from_exit[i] - 1, to[i] - 1, t) += 1;
-	    if (t < lt - 1) nrisk.at(t + 1, from_exit[i] - 1) -= 1;
+	    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+	    if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
 	} else {
-	    ++t;
-	    if (to[i] != 0) nev.at(from_exit[i] - 1, to[i] - 1, t) += 1;
-	    if (t < lt - 1) nrisk.at(t + 1, from_exit[i] - 1) -= 1;
+	    if (to[i] != 0) {
+		++t;
+		nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+	    }
+	    if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
 	}
     }
 
@@ -71,29 +75,29 @@ RcppExport SEXP gen_msm(SEXP _times,
     int l = 0;
     for (int j = 0; j < n; ++j) {
     	if (entry[j] < times[l]) {
-    	    nrisk.at(l, from_entry[j] - 1) += 1;
+    	    nrisk(l, from_entry[j] - 1) += 1;
     	}
     	else {
 	    do {
 		++l;
 		// nrisk(l, span::all) = nrisk(l - 1, span::all);
 	    } while (entry[j] >= times[l]);
-	    nrisk.at(l, from_entry[j] - 1) += 1;
+	    nrisk(l, from_entry[j] - 1) += 1;
 	}
     }
-    
+
     mat y = cumsum(nrisk);
 	
     cube dna = deltaNA(nev, y, nstate, lt);
     cube est = prodint(dna, nstate, lt);	
     // ProfilerStop();
-    
+
     return Rcpp::List::create(Rcpp::Named("n.risk") = y,
 			      Rcpp::Named("n.event") = nev,
 			      Rcpp::Named("dna") = dna,
 			      Rcpp::Named("est") = est,
 			      Rcpp::Named("time") = times);
-	
+
 }
 	
 
