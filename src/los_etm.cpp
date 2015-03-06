@@ -16,7 +16,7 @@ RcppExport SEXP los_nocp(SEXP __times,
     const double tau = Rcpp::as<double>(__tau);
     const int lt = _times.size();
     const int nstate = Dims[0];
-    cube tr_mat(_tr_mat.begin(), nstate, nstate, lt, false);
+    cube tr_mat(_tr_mat.begin(), nstate, nstate, lt);
     vec times(_times.begin(), _times.size(), false);
     
     vec T(times);
@@ -26,7 +26,7 @@ RcppExport SEXP los_nocp(SEXP __times,
     mat::fixed<3, 3> I;
     I.eye();
     
-    cube aj(nstate, nstate, lt); 
+    cube aj(nstate, nstate, lt);
 
     for (int i = 0; i < lt; ++i) {
 	tr_mat.slice(i) = tr_mat.slice(i) + I;
@@ -34,6 +34,9 @@ RcppExport SEXP los_nocp(SEXP __times,
     }
 
     vec los0(lt), los1(lt), a00(lt), a11(lt), a01(lt);
+    a00.zeros();
+    a01.zeros();
+    a11.zeros();
     
     los0.fill(tau);
     los1.fill(tau);
@@ -51,7 +54,7 @@ RcppExport SEXP los_nocp(SEXP __times,
 
 	colvec a = a00(span(t, lt - 2)) + a01(span(t, lt - 2));
 	colvec b = a11(span(t, lt - 2));
-
+	
 	los0[t] = T[t+1] + as_scalar(dd.t() * a);
 	los1[t] = T[t+1] + as_scalar(dd.t() * b);
     }
