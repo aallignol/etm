@@ -19,8 +19,6 @@ RcppExport SEXP los_nocp(SEXP __times,
     cube tr_mat(_tr_mat.begin(), nstate, nstate, lt, false);
     vec times(_times.begin(), _times.size(), false);
     
-Rcpp::Rcout << "aa=" << 1 << std::endl;
-
     vec T(times);
     T.resize(lt+1); T(lt) = tau;
 
@@ -35,8 +33,6 @@ Rcpp::Rcout << "aa=" << 1 << std::endl;
 	aj.slice(i).eye();
     }
 
-    Rcpp::Rcout << "aa=" << 2 << std::endl;
-    
     vec los0(lt), los1(lt), a00(lt), a11(lt), a01(lt);;
     
     los0.fill(tau);
@@ -44,9 +40,7 @@ Rcpp::Rcout << "aa=" << 1 << std::endl;
 
     for (int t = (times.size() - 2); t >= 0; --t) {
 
-	Rcpp::Rcout << "t=" << t << std::endl;
 	vec dd = my_diff(T(span(t+1, lt)));
-	Rcpp::Rcout << "t=" << t << std::endl;
 	
 	for (int j = t; j < lt; ++j) {
 	    aj.slice(j) = tr_mat.slice(t+1) * aj.slice(j);
@@ -55,8 +49,8 @@ Rcpp::Rcout << "aa=" << 1 << std::endl;
 	    a11(j) = aj(1, 1, j);
 	}
 
-	colvec a = a00(span(t+1, lt - 1)) + a01(span(t+1, lt - 1));
-	colvec b = a11(span(t+1, lt - 1));
+	colvec a = a00(span(t, lt - 2)) + a01(span(t, lt - 2));
+	colvec b = a11(span(t, lt - 2));
 
 	los0[t] = T(t+1) + as_scalar(dd.t() * a);
 	los1[t] = T(t+1) + as_scalar(dd.t() * b);
