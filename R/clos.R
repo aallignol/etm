@@ -35,6 +35,6 @@ clos.etm <- function(x, aw = FALSE, ratio = FALSE, ...) {
     }
     else res <- clos.nocp(x, aw, ratio)
     
-    ## class(res) <- "clos.etm"
+    class(res) <- "clos.etm"
     res
 }

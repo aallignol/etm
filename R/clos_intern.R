@@ -8,9 +8,55 @@ clos.nocp <- function(x, aw, ratio) {
     surv <- x$est[1, 1, ]
 
     ## Call to C++ function
-    zzz <- .Call("los_nocp",
+    out <- .Call("los_nocp",
                  times,
                  x$delta.na,
                  tau)
-    zzz
+
+    los[, 2] <- out$los0
+    los[, 3] <- out$los1
+    indi <- apply(x$n.event, 3, function(x) {sum(x[1, ]) != 0})
+    wait.times <- x$time[indi]
+    wait.prob <- x$est[1, 1, ][indi]
+
+    pp <- x$n.risk[-1, ]
+    ev.last <- apply(x$n.event[, , dims[3]], 1, sum)[1:2]
+    pp <- rbind(pp, pp[nrow(pp), ] - ev.last)
+    filtre <- pp[, 1] <= 0 | pp[, 2] <= 0
+
+    if (ratio) {
+        los.diff <- los[, 3] / los[, 2]
+    } else {
+        los.diff <- los[, 3] - los[, 2]
+    }
+    los.diff[filtre] <- 0
+    my.weights <- diff(c(0, 1 - wait.prob))
+    estimate <- matrix(los.diff[is.element(los[, 1], wait.times)], nrow = 1) %*%
+        matrix(my.weights, ncol=1)
+    
+    e.phi.w1 <- e.phi.w2 <- my.weights1 <- my.weights2 <- NULL
+    if (aw) {
+        cif1 <- cumsum(c(1, x$est[1, 1, 1:(dims[3] - 1)]) * tr.mat[1, 2, ])
+        my.weights1 <- diff(c(0, cif1[indi])) / cif1[length(cif1)]
+        cif2 <- cumsum(c(1, x$est[1, 1, 1:(dims[3] - 1)]) * tr.mat[1, 3, ])
+        my.weights2 <- diff(c(0, cif2[indi])) / cif2[length(cif2)]
+        weights.aw <- list(my.weights1, my.weights2)
+        estimates.aw <- lapply(weights.aw, function(z) {
+            ldiff <- los[, 3] - los[, 2]
+            ldiff[filtre] <- 0
+            estimate <- matrix(ldiff[is.element(los[, 1], wait.times)], nrow = 1) %*%
+                matrix(z, ncol = 1)
+            estimate
+        })
+        e.phi.w1 <- estimates.aw[[1]]
+        e.phi.w2 <- estimates.aw[[2]]
+    }
+    
+    res <- list(e.phi = estimate[[1]], phi.case = los[, 3],
+                phi.control = los[, 2], weights = my.weights,
+                w.time = wait.times, time = x$time, e.phi.weights.1 = e.phi.w1,
+                e.phi.weights.other = e.phi.w2, weights.1 = my.weights1,
+                weights.other = my.weights2)
+    res
 }
+
