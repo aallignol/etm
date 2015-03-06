@@ -2,6 +2,18 @@
 
 using namespace arma;
 
+vec my_diff(const vec bouh) {
+
+    int lbouh = bouh.size();
+    vec res(lbouh - 1); res.zeros();
+    
+    for (int i = 0; i < (lbouh - 1); ++i) {
+	res[i] = bouh[i+1] - bouh[i];
+    }
+
+    return res;
+}
+	    
 cube prodint(const cube & dna, int nstate, int ltimes) {
 
     cube aj(dna.begin(), nstate, nstate, ltimes);

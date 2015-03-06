@@ -1,4 +1,4 @@
-clos <- function(x, aw = FALSE) {
+clos_pure <- function(x, aw = FALSE) {
     if (!inherits(x, "etm")) {
         stop("'x' must be an 'etm' object")
     }
@@ -23,7 +23,7 @@ clos <- function(x, aw = FALSE) {
     res
 }
 
-clos.cp <- function(x, tr.mat, aw) {
+clos.cp_pure <- function(x, tr.mat, aw) {
     dims <- dim(x$est)
     times <- if (sum(x$n.event[, , dims[3]]) != 0) x$time else x$time[-length(x$time)]
     los <- matrix(rep(times, 3), ncol = 3, byrow = FALSE)
@@ -105,7 +105,7 @@ clos.cp <- function(x, tr.mat, aw) {
 
     
 
-clos.nocp <- function(x, tr.mat, aw) {
+clos.nocp_pure <- function(x, tr.mat, aw) {
     dims <- dim(x$est)
     times <- if (sum(x$n.event[, , dims[3]]) != 0) x$time else x$time[-length(x$time)]
     los <- matrix(rep(times, 3), ncol = 3, byrow = FALSE)
