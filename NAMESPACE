@@ -1,6 +1,9 @@
 useDynLib(etm3)
 importFrom(Rcpp, evalCpp)
-## export(etm)
-## S3method(etm, data.frame)
-exportPattern("^[[:alpha:]]+")
+export(etm, clos, tra_ill, tra_ill_comp, tra_comp, tra_surv)
+S3method(etm, data.frame)
+S3method(clos, msfit)
+S3method(clos, etm)
+
+## exportPattern("^[[:alpha:]]+")
 

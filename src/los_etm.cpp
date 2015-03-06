@@ -20,7 +20,7 @@ RcppExport SEXP los_nocp(SEXP __times,
     vec times(_times.begin(), _times.size(), false);
     
     vec T(times);
-    T.resize(lt+1); T(lt) = tau;
+    T.resize(lt+1); T[lt] = tau;
 
     // new stuffs we'll need
     mat::fixed<3, 3> I;
@@ -33,7 +33,7 @@ RcppExport SEXP los_nocp(SEXP __times,
 	aj.slice(i).eye();
     }
 
-    vec los0(lt), los1(lt), a00(lt), a11(lt), a01(lt);;
+    vec los0(lt), los1(lt), a00(lt), a11(lt), a01(lt);
     
     los0.fill(tau);
     los1.fill(tau);
@@ -52,8 +52,8 @@ RcppExport SEXP los_nocp(SEXP __times,
 	colvec a = a00(span(t, lt - 2)) + a01(span(t, lt - 2));
 	colvec b = a11(span(t, lt - 2));
 
-	los0[t] = T(t+1) + as_scalar(dd.t() * a);
-	los1[t] = T(t+1) + as_scalar(dd.t() * b);
+	los0[t] = T[t+1] + as_scalar(dd.t() * a);
+	los1[t] = T[t+1] + as_scalar(dd.t() * b);
     }
 
     return Rcpp::List::create(Rcpp::Named("los0") = los0,
