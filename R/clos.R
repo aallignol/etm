@@ -43,12 +43,14 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
         stop("cox model fit is missing")
     }
 
-    CumHaz <- dplyr::group_by(x$Haz, trans)
-    CumHaz <- dplyr::mutate(CumHaz, dhaz = diff(c(0, Haz)))
+    ## CumHaz <- dplyr::group_by(x$Haz, trans)
+    ## CumHaz <- dplyr::mutate(CumHaz, dhaz = diff(c(0, Haz)))
+    CumHaz <- data.table(x$Haz)
+    CumHaz[, dhaz := diff(c(0, Haz)), by = trans]
 
     trans <- x$trans[!is.na(x$trans)]
     ltrans <- dim(x$trans)
-    ltimes <- as.numeric(summarise(CumHaz, length(time))[1, 2])
+    ltimes <- unique(CumHaz[, length(time), by = trans][, V1])
 
     times <- sort(unique(CumHaz$time))
     

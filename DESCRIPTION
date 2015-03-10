@@ -7,7 +7,7 @@ Description: Matrix of transition probabilities for any time-inhomogeneous multi
 Maintainer: Arthur Allignol <arthur.allignol@uni-ulm.de>
 License: GPL (>=2)
 Depends: R (>= 3.0.2), survival
-Imports: lattice,dplyr,Rcpp (>= 0.11.4)
+Imports: lattice,data.table,Rcpp (>= 0.11.4)
 Suggests: ggplot2, kmi, geepack
 LinkingTo: Rcpp, RcppArmadillo
 
