@@ -77,7 +77,9 @@ RcppExport SEXP gen_msm(SEXP _times,
 	    }
 	}
     }
-
+    
+    //Rcpp::Rcout << "break = " << 5 << std::endl;
+    
     // the entries
     int l = 0;
     for (int j = 0; j < n; ++j) {
@@ -87,18 +89,18 @@ RcppExport SEXP gen_msm(SEXP _times,
     	else {
 	    do {
 		++l;
-		// nrisk(l, span::all) = nrisk(l - 1, span::all);
-	    } while (entry[j] >= times[l]);
-	    nrisk(l, from_entry[j] - 1) += 1;
+	    } while (l < lt && entry[j] >= times[l]);
+	    if (l < lt) nrisk(l, from_entry[j] - 1) += 1;
 	}
     }
-
+    // Rcpp::Rcout << "break = " << 6 << std::endl;
     mat y = cumsum(nrisk);
 	
     cube dna = deltaNA(nev, y, nstate, lt);
     cube est = prodint(dna, nstate, lt);	
     // ProfilerStop();
-
+    // Rcpp::Rcout << "break = " << 7 << std::endl;
+    
     return Rcpp::List::create(Rcpp::Named("n.risk") = y,
 			      Rcpp::Named("n.event") = nev,
 			      Rcpp::Named("dna") = dna,

@@ -6,7 +6,7 @@ Author: Arthur Allignol
 Description: Matrix of transition probabilities for any time-inhomogeneous multistate model with finite state space
 Maintainer: Arthur Allignol <arthur.allignol@uni-ulm.de>
 License: GPL (>=2)
-Depends: R (>= 3.0.2), survival
+Depends: R (>= 3.0.0), survival
 Imports: lattice,data.table,Rcpp (>= 0.11.4)
 Suggests: ggplot2, kmi, geepack
 LinkingTo: Rcpp, RcppArmadillo
