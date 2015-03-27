@@ -164,3 +164,5 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
     
     res
 }
+
+### with Hist
