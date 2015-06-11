@@ -166,3 +166,21 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
 }
 
 ### with Hist
+etm.formula <- function(formula, data, subset, na.action) {
+
+    call <- match.call()
+    if (missing(data)) 
+        data <- environment(formula)
+    if (!missing(subset)) 
+        data <- subset(data, subset = subset)
+
+    mod <- EventHistory.frame(formula,
+                              data,
+                              specials = c("strata", "factor"),
+                              stripSpecials = "strata",
+                              stripAlias = list(strata = c("Strata", "factor")),
+                              check.formula = TRUE)
+
+    mod
+}
+                              
