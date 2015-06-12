@@ -128,7 +128,55 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
             stop("Exit time from a state must be > entry time")
     }
 
+    x[, from := as.integer(as.character(from))]
+    x[, to := as.integer(as.character(to))]
+
+    if (t=="last") t <- max(x$exit)
+    if (!(0 <= s & s < t))
+        stop("'s' and 't' must be positive, and s < t")
+    if (t <= x[, min(exit)] | s >= x[, max(exit)])
+        stop("'s' or 't' is an invalid time")
+
     
+    zzz <- .etm(entry = x$entry,
+                exit = x$exit,
+                from = x$from,
+                to = x$to,
+                nstate = dim(tra)[1],
+                s,
+                t)
+
+    
+    nrisk <- zzz$n.risk
+    colnames(nrisk) <- state.names
+    nrisk <- nrisk[, !(colnames(nrisk) %in%
+                       setdiff(unique(trans$to), unique(trans$from))),
+                   drop = FALSE]
+
+    est <- zzz$est
+    nev <- zzz$n.event
+    
+    dimnames(est) <- list(state.names, state.names, zzz$time)
+    dimnames(nev) <- list(state.names, state.names, zzz$time)
+
+    res <- list(model = NULL,
+                est = est,
+                cov = NULL,
+                time = zzz$time,
+                s = s,
+                t = t,
+                trans = trans,
+                tra = tra,
+                state.names = state.names,
+                n.risk = nrisk,
+                n.event = nev,
+                delta.na = zzz$dna,
+                data = x)
+    class(res) <- "etm"
+    
+    res
+}
+
 
 etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                            covariance=TRUE, delta.na = TRUE, modif = FALSE,
