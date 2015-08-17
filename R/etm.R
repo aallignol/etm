@@ -40,13 +40,16 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
             stop("The name of the censoring variable just is a name of the model states.")
         }
     }
+    ## The stratification variable
     if (missing(strat_variable)) {
-        strat_var = "X"
+        strat_var <- "X"
         x$X <- 1
+        is_stratified <- FALSE
     } else {
         if (!all(strat_variable %in% names(x)))
             stop("Stratification variables not in data")
         strat_var <- strat_variable
+        is_stratified <- TRUE
     }
 
     ## if modif TRUE, check that the model is competing risks. else
@@ -62,15 +65,15 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
 
     ## Transform x to data.table and keep only the variables we need
     x <- data.table(x)
-    
-    reg <- names(dt)
+
+    reg <- names(x)
     names_msm <- intersect(c("id", "entry", "exit", "time", "from", "to", strat_var), reg)
     x <- x[, names_msm, with = FALSE]
 
 ### Work through the stratification variables
     combi <- unique(x[, strat_var, with = FALSE])
-    if (length(strat_var == 1)) {
-        conditions <- lapply(seq_len(combi), function(i) {
+    if (length(strat_var) == 1) {
+        conditions <- lapply(seq_len(nrow(combi)), function(i) {
                                  parse(text = paste0(strat_var, " == ", combi[i]))
                              })
     } else {
@@ -82,7 +85,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                                        collapse = " & "))
                              })
     }
-        
+
 ### transitions
     colnames(tra) <- rownames(tra) <- state.names
     t.from <- lapply(1:dim(tra)[2], function(i) {
@@ -154,42 +157,56 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
     if (t <= x[, min(exit)] | s >= x[, max(exit)])
         stop("'s' or 't' is an invalid time")
 
-    
-    zzz <- .etm(entry = x$entry,
-                exit = x$exit,
-                from = x$from,
-                to = x$to,
-                nstate = dim(tra)[1],
-                s,
-                t)
+    res <- lapply(conditions, function(ll)
+    {
+        zzz <- .etm(entry = x[eval(ll), entry],
+                    exit = x[eval(ll), exit],
+                    from = x[eval(ll), from],
+                    to = x[eval(ll), to],
+                    nstate = dim(tra)[1],
+                    s,
+                    t)
+        
+        nrisk <- zzz$n.risk
+        colnames(nrisk) <- state.names
+        nrisk <- nrisk[, !(colnames(nrisk) %in%
+                             setdiff(unique(trans$to), unique(trans$from))),
+                       drop = FALSE]
+        
+        est <- zzz$est
+        nev <- zzz$n.event
+        
+        dimnames(est) <- list(state.names, state.names, zzz$time)
+        dimnames(nev) <- list(state.names, state.names, zzz$time)
+        
+        res <- list(est = est,
+                    cov = NULL,
+                    time = zzz$time,
+                    n.risk = nrisk,
+                    n.event = nev,
+                    delta.na = zzz$dna,
+                    s = s,
+                    t = t)
+        class(res) <- "etm"
+        res
+    })
 
-    
-    nrisk <- zzz$n.risk
-    colnames(nrisk) <- state.names
-    nrisk <- nrisk[, !(colnames(nrisk) %in%
-                       setdiff(unique(trans$to), unique(trans$from))),
-                   drop = FALSE]
-
-    est <- zzz$est
-    nev <- zzz$n.event
-    
-    dimnames(est) <- list(state.names, state.names, zzz$time)
-    dimnames(nev) <- list(state.names, state.names, zzz$time)
-
-    res <- list(model = NULL,
-                est = est,
-                cov = NULL,
-                time = zzz$time,
-                s = s,
-                t = t,
-                trans = trans,
-                tra = tra,
-                state.names = state.names,
-                n.risk = nrisk,
-                n.event = nev,
-                delta.na = zzz$dna,
-                data = x)
-    class(res) <- "etm"
+    if (is_stratified) {
+        names(res) <- do.call('c', lapply(conditions, as.character))
+        res$trans <- trans
+        res$tra <- tra
+        res$state.names <- state.names
+        res$data <- x
+        res$strat_variable <- strat_variable
+        res$X <- do.call('c', lapply(conditions, as.character))
+        class(res) <- "etm_stratified"
+    } else {
+        res <- res[[1]]
+        res$trans <- trans
+        res$tra <- tra
+        res$state.names <- state.names
+        res$data <- x
+    }
     
     res
 }
