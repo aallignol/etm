@@ -187,7 +187,6 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                     delta.na = zzz$dna,
                     s = s,
                     t = t)
-        class(res) <- "etm"
         res
     })
 
@@ -206,6 +205,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
         res$tra <- tra
         res$state.names <- state.names
         res$data <- x
+        class(res) <- "etm"
     }
     
     res
