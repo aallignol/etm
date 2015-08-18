@@ -65,3 +65,51 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
     }
     tmp
 }
+
+## For the stratified etm:
+"[.etm_stratified" <- function(x, ..., time, drop = FALSE) {
+
+    if (missing(..1)) i <- NULL else i <- ..1
+
+    ## No subscript, do nothing
+    if (is.null(i)) return(x)
+
+    if (is.character(i)) {
+        ind <- match(gsub(" ", "", i, fixed = TRUE),
+                     gsub(" ", "", x$strata, fixed = TRUE))
+        if (any(is.na(ind))) stop(paste("subscript(s)",
+                                        paste(i[is.na(ind)], sep = " "),
+                                        "not matched"))
+    } else {
+        ind <- i
+        if (max(ind) > length(x$strata))
+            stop(paste0("There is only ", length(x$strata), " strata"))
+    }
+
+    if (length(ind) == 1) {
+
+        res <- x[[ind]]
+        res$trans <- x$trans
+        res$tra <- x$tra
+        res$state.names <- x$state.names
+        res$data <- x$data
+        res$strat_variable <- x$strata_variable
+        res$strata <- x$strata[ind]
+        class(res) <- "etm"
+
+    } else {
+
+        res <- unclass(x)[ind]
+        res$trans <- x$trans
+        res$tra <- x$tra
+        res$state.names <- x$state.names
+        res$data <- x$data
+        res$strat_variable <- x$strata_variable
+        res$strata <- x$strata[ind]
+        class(res) <- "etm_stratified"
+
+    }
+
+    res
+
+}
