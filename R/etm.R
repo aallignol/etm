@@ -165,7 +165,8 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                     to = x[eval(ll), to],
                     nstate = dim(tra)[1],
                     s,
-                    t)
+                    t,
+                    covariance)
         
         nrisk <- zzz$n.risk
         colnames(nrisk) <- state.names
