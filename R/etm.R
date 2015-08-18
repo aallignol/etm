@@ -198,7 +198,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
         res$data <- x
         res$strata_variable <- strat_variable
         res$strata <- do.call('c', lapply(conditions, as.character))
-        class(res) <- "etmStratified"
+        class(res) <- "etm.stratified"
     } else {
         res <- res[[1]]
         res$trans <- trans

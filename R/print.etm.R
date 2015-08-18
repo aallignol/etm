@@ -34,10 +34,10 @@ print.etm <- function(x, covariance = FALSE, whole = TRUE, ...) {
 }
     
 ### etmStratified
-print.etmStratified <- function(x, covariance = FALSE, whole = TRUE, ...) {
+print.etm.stratified <- function(x, covariance = FALSE, whole = TRUE, ...) {
     
-    if (!inherits(x, "etmStratified"))
-        stop("'x' must be of class 'etmStratified'")
+    if (!inherits(x, "etm.stratified"))
+        stop("'x' must be of class 'etm.stratified'")
     
     absorb <- setdiff(levels(x$trans$to), levels(x$trans$from))
     transient <- unique(x$state.names[!(x$state.names %in% absorb)])

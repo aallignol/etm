@@ -71,7 +71,7 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
 ### For the stratified etm ###
 ##############################
 
-"[.etmStratified" <- function(x, ..., time, drop = FALSE) {
+"[.etm.stratified" <- function(x, ..., time, drop = FALSE) {
 
     if (missing(..1)) i <- NULL else i <- ..1
 
@@ -110,7 +110,7 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         res$data <- x$data
         res$strat_variable <- x$strata_variable
         res$strata <- x$strata[ind]
-        class(res) <- "etmStratified"
+        class(res) <- "etms.tratified"
 
     }
 
@@ -118,10 +118,10 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
 
 }
 
-trprob.etmStratified <- function(x, tr.choice, timepoints, ...) {
+trprob.etm.stratified <- function(x, tr.choice, timepoints, ...) {
     
-    if (!inherits(x, "etmStratified"))
-        stop("'x' must be a 'etmStratified' object")
+    if (!inherits(x, "etm.stratified"))
+        stop("'x' must be a 'etm.stratified' object")
     if (!is.character(tr.choice))
         stop("'tr.choice' must be a character vector")
     if (length(tr.choice) != 1)
@@ -147,7 +147,6 @@ trprob.etmStratified <- function(x, tr.choice, timepoints, ...) {
 
     zzz <- lapply(seq_along(x$strata), function(i)
     {
-        
         xx <- x[i]
 
         if (is_missing_time) {
