@@ -46,7 +46,7 @@ RcppExport SEXP cov_aj(SEXP __time,
     for (int t = 1; t < lt; ++t) {
 	
 	mat temp_dna(dna.slice(t).begin(), nstate, nstate, false);
-	mat temp_est(est.slice(t).begin(), nstate, nstate, false);
+	mat temp_est(est.slice(t - 1).begin(), nstate, nstate, false);
 	
 	cov_deltaNA = cov_dna(nevent.slice(t),
 			      nrisk.row(t).t(),

@@ -71,15 +71,10 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
     }
     
     vec sum_nev = sum(nev, 1);
-    Rcpp::Rcout << "****** " << sum_nev << std::endl;
     vec pow_nrisk = pow(nrisk, -3);
     
     for (int j = 0; j < D; ++j) {
 	for (int i = 0; i < D; ++i) {
-
-	    // Rcpp::Rcout << "*************i " << i << std::endl;
-	    // Rcpp::Rcout << "*************j " << j << std::endl;
-	    // Rcpp::Rcout << "nrisk " << nrisk[from[i]] << std::endl;
 
 	    if (nrisk[from[i]] != 0) {
 		
@@ -88,18 +83,10 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
 		    4 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] == to[j]) +
 		    8 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] != to[j]);
 		
-		// Rcpp::Rcout << "the condition " << cond << std::endl;
-		
 		switch(cond) {
 		case 1:
-		// Rcpp::Rcout << "from[i] " << from[i] << std::endl;
-		// Rcpp::Rcout << "from[j] " << from[j] << std::endl;
-		// Rcpp::Rcout << "to[i] " << to[i] << std::endl;
-		// Rcpp::Rcout << "to[j] " << to[j] << std::endl;
-		    
 		    the_cov(i, j) = (nrisk[from[i]] - sum_nev[from[i]]) *
 			sum_nev[from[i]] * pow_nrisk[from[i]];
-		    Rcpp::Rcout << "cov " << sum_nev[from[i]] << std::endl;
 		    break;
 		case 2: 
 		    the_cov(i, j) = -(nrisk[from[i]] - sum_nev[from[i]]) *
