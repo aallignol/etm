@@ -176,12 +176,24 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
         
         est <- zzz$est
         nev <- zzz$n.event
+        var_aj <- zzz$cov
         
         dimnames(est) <- list(state.names, state.names, zzz$time)
         dimnames(nev) <- list(state.names, state.names, zzz$time)
+
+        if (covariance) {
+            pos <- sapply(1:length(state.names), function(i) {
+                              paste(state.names, state.names[i])
+                          })
+            pos <- matrix(pos)
+            dimnames(var_aj) <- list(pos, pos, zzz$time)
+        } else {
+            var_aj <- NULL
+        }
+
         
         res <- list(est = est,
-                    cov = NULL,
+                    cov = var_aj,
                     time = zzz$time,
                     n.risk = nrisk,
                     n.event = nev,

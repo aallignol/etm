@@ -20,16 +20,17 @@
 
     if (covariance) {
 
-        stop("doing")
-        var <- .Call("cov_aj",
-                     zzz$time,
-                     zzz$est,
-                     zzz$n.risk,
-                     zzz$n.event,
-                     zzz$dna)
+        cov_etm <- .Call("cov_aj",
+                         zzz$time,
+                         zzz$est,
+                         zzz$n.risk,
+                         zzz$n.event,
+                         zzz$dna)
+
+        zzz$cov <- cov_etm
         
     }
-        
+    
     zzz
 }
     

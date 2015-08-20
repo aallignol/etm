@@ -14,7 +14,7 @@ RcppExport SEXP cov_aj(SEXP __time,
 {
 
     Rcpp::NumericVector _time(__time), _est(__est), _nevent(__nevent), _dna(__dna);
-    Rcpp::IntegerVector dims = _est.att("dim");
+    Rcpp::IntegerVector dims = _est.attr("dim");
     Rcpp::NumericMatrix _nrisk(__nrisk);
     
     const int lt = _time.size();
@@ -34,27 +34,29 @@ RcppExport SEXP cov_aj(SEXP __time,
     mat II(D, D, fill::eye);
     mat cov_deltaNA(D, D, fill::zeros);
 
+
     // first iteration
-    cov_deltaNA = cov_dna(dna.slice(0),
-			  nrisk.row(0),
+    cov_deltaNA = cov_dna(nevent.slice(0),
+			  nrisk.row(0).t(),
 			  nstate,
 			  D);
+    
     cov_etm.slice(0) = II * cov_deltaNA * II;
     
-    for (int t = 1; t < lt, ++t) {
+    for (int t = 1; t < lt; ++t) {
 	
 	mat temp_dna(dna.slice(t).begin(), nstate, nstate, false);
 	mat temp_est(est.slice(t).begin(), nstate, nstate, false);
 	
-	cov_deltaNA = cov_dna(temp_dna,
-			      nrisk.row(t),
+	cov_deltaNA = cov_dna(nevent.slice(t),
+			      nrisk.row(t).t(),
 			      nstate,
 			      D);
-	
-	cov_etm.slice(t) = kron((I + temp_dna).t(), II) * cov_etm.slice(t - 1) * kron((I+temp_dna),II) +
+
+	cov_etm.slice(t) = kron((I + temp_dna).t(), I) * cov_etm.slice(t - 1) * kron((I+temp_dna),I) +
 	    kron(I, temp_est) * cov_deltaNA * kron(I, temp_est.t());
 	
     }
 
-    return cov_etm;
+    return(Rcpp::wrap(cov_etm));
 }
