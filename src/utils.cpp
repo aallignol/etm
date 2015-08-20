@@ -28,29 +28,6 @@ cube prodint(const cube & dna, int nstate, int ltimes) {
     return aj;
 }
 
-// cube prodint(const cube & dna, int nstate, int ltimes) {
-
-//     cube aj(dna.begin(), nstate, nstate, ltimes);
-//     mat I = eye<mat>(nstate, nstate);
-
-//     aj.slice(0) = aj.slice(0) + I;
-
-//     cube::slice_iterator c = aj.begin_slice(1);
-//     cube::slice_iterator d = aj.end();
-//     cube::iterator a = aj.begin();
-//     cube::slice_iterator b = aj.begin_slice(ltimes - 1);
-
-//     cube::iterator i; cube::iterator j;
-//     for (i=c, j=a; i!=d; i += nstate * nstate, j += nstate * nstate) {
-	
-// 	mat bouh(i, nstate, nstate, false);
-// 	mat yah(j, nstate, nstate, false);
-
-// 	bouh = yah * (I + bouh);
-//     }
-
-//     return aj;
-// }
 
 cube deltaNA(const cube & nev, const mat & nrisk, int nstate, int ltimes) {
 
@@ -75,3 +52,62 @@ cube deltaNA(const cube & nev, const mat & nrisk, int nstate, int ltimes) {
     return dna;
 
 }
+
+mat cov_dna(const mat & dna, const vec & nrisk, int d, int D) {
+
+    mat the_cov(D, D);
+    the_cov.zeros();
+
+    uvec from(D); from.zeros();
+    uvec to(D); to.zeros();
+
+    // construct vectors that store the k and l; m, n for each
+    // indice of the final covariance matrix
+    for (int i = 0; i < d; ++i) {
+	for (int j = 0; j < d; ++j) {
+	    from[j + i * d] = j;
+	    to[j + i * d] = i;
+	}
+    }
+
+    vec sum_dna = sum(dna, 1);
+    vec pow_nrisk = pow(nrisk, -3);
+    
+    for (int j = 0; i < D; ++i) {
+	for (int i = 0; j < D, ++j) {
+
+	    if (nrisk[from[i]] != 0) {
+
+		int cond = 1 * (from[i] == to[i] && from[i] == from[j] && from[j] == to[j]) +
+		    2 * (from[i] == to[i] && from[i] == from[j] && from[i] != to[j]) +
+		    4 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] == to[j]) +
+		    8 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] != to[j]);
+		
+		switch(cond) {
+		case 1:
+		    the_cov[i, j] = (nrisk[from[i]] - sum_dna[from[i]]) *
+			sum_dna[from[i]] * pow_nrisk[from[i]];
+		    break;
+		case 2: 
+		    the_cov[i, j] = -(nrisk[from[i]] - sum_dna[from[i]]) *
+			dna[from[i], to[j]] * pow_nrisk[from[i]];
+		    break;
+		case 4:
+		    the_cov[i, j] = (nrisk[from[i]] - dna[from[i], to[i]]) *
+			dna[from[i], to[j]] * pow_nrisk[from[i]];
+		    break;
+		case 8:
+		    the_cov[i, j] =  -dna[from[i], to[i]] *
+			dna[from[i], to[j]] * pow_nrisk[from[i]];
+		    break;
+		default:
+		    the_cov[i, j] = 0;
+		}
+
+	    }
+	}
+    }
+
+    return the_cov;
+}
+		    
