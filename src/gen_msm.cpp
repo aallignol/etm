@@ -53,7 +53,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     // define the matrices we need
     mat nrisk(lt, nstate); nrisk.zeros();
     cube nev(nstate, nstate, lt); nev.zeros();
-
+    cube dna(nstate, nstate, lt); dna.zeros();
 
     if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
     nrisk(1, from_exit[0] - 1) -= 1;
@@ -99,15 +99,17 @@ RcppExport SEXP gen_msm(SEXP _times,
     // Rcpp::Rcout << "break = " << 6 << std::endl;
     mat y = cumsum(nrisk);
 
+    
+    
     if (const_modif > 0) {
 	umat tmp = (y > const_modif);
 	mat  which_compute = conv_to<mat>::from(tmp);
 	// Nelson-Aalen (the increments) Lai and Ying
-	cube dna = deltaNA_LY(nev, y, nstate, lt, which_compute);
+	dna = deltaNA_LY(nev, y, which_compute, nstate, lt);
     }
     else {
 	// Nelson-Aalen (the increments) original
-	cube dna = deltaNA(nev, y, nstate, lt);
+	dna = deltaNA(nev, y, nstate, lt);
     }
     
     cube est = prodint(dna, nstate, lt);	
