@@ -3,9 +3,9 @@ etm <- function(x, ...) {
 }
 
 
-etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
-                           covariance=TRUE, delta.na = TRUE, modif = FALSE,
-                           alpha = 1/4, c = 1, strat_variable) {
+etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
+                           covariance = TRUE, delta.na = TRUE, modif = FALSE,
+                           c = 1, alpha = NULL, strat_variable) {
 
     if (missing(x))
         stop("Argument 'x' (the data) is missing with no default")
@@ -157,6 +157,17 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
     if (t <= x[, min(exit)] | s >= x[, max(exit)])
         stop("'s' or 't' is an invalid time")
 
+    ## The Lai and Ying modification (if any)
+    if (modif) {
+        if (is.null(alpha)) {
+            c_modif <- alpha
+        } else {
+            c_modif <- c * n^alpha
+        }
+    } else {
+        c_modif <- 0
+    }
+
     res <- lapply(conditions, function(ll)
     {
         zzz <- .etm(entry = x[eval(ll), entry],
@@ -166,7 +177,8 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t="last",
                     nstate = dim(tra)[1],
                     s,
                     t,
-                    covariance)
+                    covariance,
+                    c_modif)
         
         nrisk <- zzz$n.risk
         colnames(nrisk) <- state.names

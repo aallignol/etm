@@ -7,6 +7,7 @@ using namespace arma;
 
 cube prodint(const cube & dna, int nstate, int ltimes);
 cube deltaNA(const cube & nev, const mat & nrisk, int nstate, int ltimes);
+cube deltaNA_LY(const cube & nev, const mat & nrisk, const mat & which_compute, int nstate, int ltimes);
 
 
 RcppExport SEXP gen_msm(SEXP _times,
@@ -14,7 +15,8 @@ RcppExport SEXP gen_msm(SEXP _times,
 			SEXP _exit,
 			SEXP _from,
 			SEXP _to,
-			SEXP _nstate)
+			SEXP _nstate,
+			SEXP _const_modif)
 
 {
 
@@ -44,6 +46,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     const int lt = times.size();
     const int n = entry.size();
     const int nstate = Rcpp::as<int>(_nstate);
+    const int const_modif = Rcpp::as<int>(_const_modif);
 
     //const int cova = Rcpp::as<int>(_covariance);
     
@@ -95,8 +98,18 @@ RcppExport SEXP gen_msm(SEXP _times,
     }
     // Rcpp::Rcout << "break = " << 6 << std::endl;
     mat y = cumsum(nrisk);
-	
-    cube dna = deltaNA(nev, y, nstate, lt);
+
+    if (const_modif > 0) {
+	umat tmp = (y > const_modif);
+	mat  which_compute = conv_to<mat>::from(tmp);
+	// Nelson-Aalen (the increments) Lai and Ying
+	cube dna = deltaNA_LY(nev, y, nstate, lt, which_compute);
+    }
+    else {
+	// Nelson-Aalen (the increments) original
+	cube dna = deltaNA(nev, y, nstate, lt);
+    }
+    
     cube est = prodint(dna, nstate, lt);	
     // ProfilerStop();
     // Rcpp::Rcout << "break = " << 7 << std::endl;

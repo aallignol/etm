@@ -11,12 +11,13 @@
                  nstate,
                  s,
                  t,
-                 covariance) {
+                 covariance,
+                 const_modif) {
 
     times <- unique(exit[to != 0])
     times <- times[times > s & times <= t]
 
-    zzz <- .Call("gen_msm", times, entry, exit, from, to, nstate)
+    zzz <- .Call("gen_msm", times, entry, exit, from, to, nstate, const_modif)
 
     if (covariance) {
 
