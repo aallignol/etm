@@ -53,6 +53,38 @@ cube deltaNA(const cube & nev, const mat & nrisk, int nstate, int ltimes) {
 
 }
 
+
+/* 
+lai and ying modification of the Nelson Aalen estimator.
+we have an extra argument: a matrix similar to nrisk, with 0s and 1s
+that says where we should compute
+*/
+cube deltaNA_LY(const cube & nev, const mat & nrisk, const mat & which_compute,
+		int nstate, int ltimes) {
+
+    cube dna(nstate, nstate, ltimes);
+    dna.zeros();
+    
+    for (int t=0; t < ltimes; ++t) {
+	for (int i=0; i < nstate; ++i) {
+	    if (nrisk.at(t, i) != 0) {
+		for (int j=0; j< nstate; ++j) {
+		    dna.at(i, j, t) = which_compute.at(t, i) * nev.at(i, j, t) / nrisk.at(t, i);
+		}
+	    }
+	}
+	
+	mat tmp(dna.slice(t).begin(), nstate, nstate, false);
+	vec d = sum(tmp, 1);
+    	tmp.diag() = -d;
+
+    }
+    
+    return dna;
+
+}
+    
+
 mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
 
     mat the_cov(D, D);
