@@ -160,7 +160,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     ## The Lai and Ying modification (if any)
     if (modif) {
         if (is.null(alpha)) {
-            c_modif <- alpha
+            c_modif <- c
         } else {
             c_modif <- c * n^alpha
         }
