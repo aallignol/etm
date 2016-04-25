@@ -17,7 +17,9 @@
     times <- unique(exit[to != 0])
     times <- times[times > s & times <= t]
 
-    zzz <- .Call("gen_msm", times, entry, exit, from, to, nstate, const_modif)
+    c_modif <- matrix(const_modif, length(times), nstate, byrow = TRUE)
+
+    zzz <- .Call("gen_msm", times, entry, exit, from, to, nstate, c_modif)
 
     if (covariance) {
 

@@ -160,8 +160,17 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     ## The Lai and Ying modification (if any)
     if (modif) {
         if (is.null(alpha)) {
-            c_modif <- c
+            if (length(c) == 1) {
+                c_modif <- c
+            } else {
+                if (length(c) != length(state.names)) {
+                    stop("if specifying a unique c for each transient state, 'c' should be the same length as the 'state.names'")
+                } else {
+                    c_modif <- c
+                }
+            }
         } else {
+            ## the original lay and ying proposal
             c_modif <- c * n^alpha
         }
     } else {

@@ -22,6 +22,7 @@ RcppExport SEXP gen_msm(SEXP _times,
 
     Rcpp::NumericVector __entry(_entry), __exit(_exit), times(_times);
     Rcpp::IntegerVector __from(_from), __to(_to);
+    Rcpp::IntegerMatrix __const_modif(_const_modif);
 
     // ProfilerStart("/tmp/gen_msm.prof");
     
@@ -29,6 +30,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     vec Texit(__exit.begin(), __exit.size(), false);
     ivec Tfrom(__from.begin(), __from.size(), false);
     ivec Tto(__to.begin(), __to.size(), false);
+    imat const_modif(__const_modif.begin(), __const_modif.nrow(), __const_modif.ncol(), false);
 
     // vec entry(Tentry), exit(Texit);
     // ivec to(Tto), from_entry(Tfrom), from_exit(Tfrom);
@@ -46,7 +48,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     const int lt = times.size();
     const int n = entry.size();
     const int nstate = Rcpp::as<int>(_nstate);
-    const int const_modif = Rcpp::as<int>(_const_modif);
+    // const int const_modif = Rcpp::as<int>(_const_modif);
 
     //const int cova = Rcpp::as<int>(_covariance);
     
@@ -99,10 +101,9 @@ RcppExport SEXP gen_msm(SEXP _times,
     // Rcpp::Rcout << "break = " << 6 << std::endl;
     mat y = cumsum(nrisk);
 
-    
-    
-    if (const_modif > 0) {
-	umat tmp = (y > const_modif);
+    ivec cc = const_modif.row(0);
+    if (any(cc)) {
+	umat tmp = (y >= const_modif);
 	mat  which_compute = conv_to<mat>::from(tmp);
 	// Nelson-Aalen (the increments) Lai and Ying
 	dna = deltaNA_LY(nev, y, which_compute, nstate, lt);
