@@ -1,5 +1,6 @@
 \name{etm}
 \alias{etm}
+\alias{etm.data.frame}
 
 \title{Computation of the empirical transition matrix}
 \description{
@@ -8,12 +9,12 @@
   multistate model. The covariance matrix is also computed.
 }
 \usage{
-etm(data, state.names, tra, cens.name, s, t = "last",
+\S3method{etm}{data.frame}(x, state.names, tra, cens.name, s, t = "last",
     covariance = TRUE, delta.na = TRUE, modif = FALSE,
-    alpha = 1/4, c = 1)
+    c = 1, alpha = NULL, strat_variable)
 }
 \arguments{
-  \item{data}{ data.frame of the form data.frame(id,from,to,time)
+  \item{x}{data.frame of the form data.frame(id,from,to,time)
     or (id,from,to,entry,exit)
     \describe{
     \item{id:}{patient id}
@@ -43,8 +44,15 @@ etm(data, state.names, tra, cens.name, s, t = "last",
     increments of the Nelson-Aalen estimator. Default is \code{TRUE}.}
   \item{modif}{Logical. Whether to apply the modification of Lai and
     Ying for small risk sets}
-  \item{alpha}{Constant}
-  \item{c}{Constant}
+  \item{c}{Constant for the Lai and Ying modification. Either \code{c}
+    contains only one value that will be used for all the states,
+    otherwise \code{c} should be the same length as
+    \code{state.names}.}
+  \item{alpha}{Constant for the Lai and Ying modification. If NULL (the
+    default) then only \code{c} is used and the Lai and Ying
+    modification discards the event times for which \eqn{Y(t) \geq
+      t}{Y(t) >= t}. Otherwise \eqn{cn^\alpha}{cn^alpha} is used. It is
+    recommanded to let \code{alpha} equal NULL for multistate models.}
 }
 \details{
   Data are considered to arise from a time-inhomogeneous Markovian
