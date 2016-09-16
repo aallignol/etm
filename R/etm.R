@@ -157,6 +157,9 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     if (t <= x[, min(exit)] | s >= x[, max(exit)])
         stop("'s' or 't' is an invalid time")
 
+    ## remove the lines in which transition before s
+    x <- x[exit > s]
+
     ## The Lai and Ying modification (if any)
     if (modif) {
         if (is.null(alpha)) {

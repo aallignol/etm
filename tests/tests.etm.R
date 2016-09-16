@@ -147,74 +147,74 @@ all.equal(aa$"0 1"$P, as.vector(trprob(cif.control, "0 1")))
 
 ### test on los data
 
-data(los.data) # in package changeLOS
+## data(los.data) # in package changeLOS
 
-## putting los.data in the long format (see changeLOS)
-my.observ <- prepare.los.data(x=los.data)
+## ## putting los.data in the long format (see changeLOS)
+## my.observ <- prepare.los.data(x=los.data)
 
-tra <- matrix(FALSE, 4, 4)
-tra[1, 2:4] <- TRUE
-tra[2, 3:4] <- TRUE
+## tra <- matrix(FALSE, 4, 4)
+## tra[1, 2:4] <- TRUE
+## tra[2, 3:4] <- TRUE
 
-tr.prob <- etm(my.observ, c("0","1","2","3"), tra, NULL, 0)
+## tr.prob <- etm(my.observ, c("0","1","2","3"), tra, NULL, 0)
 
-tr.prob
-summary(tr.prob)
+## tr.prob
+## summary(tr.prob)
 
-cLOS <- etm::clos(tr.prob, aw = TRUE)
+## cLOS <- etm::clos(tr.prob, aw = TRUE)
 
-cLOS
+## cLOS
 
 
-### Tests on pseudo values
-t_pseudo <- closPseudo(my.observ, c("0","1","2","3"), tra, NULL,
-                       formula = ~ 1, aw = TRUE)
+## ### Tests on pseudo values
+## t_pseudo <- closPseudo(my.observ, c("0","1","2","3"), tra, NULL,
+##                        formula = ~ 1, aw = TRUE)
 
-cLOS$e.phi == t_pseudo$theta[, "e.phi"]
-cLOS$e.phi.weights.1 == t_pseudo$theta[, "e.phi.weights.1"]
-cLOS$e.phi.weights.other == t_pseudo$theta[, "e.phi.weights.other"]
+## cLOS$e.phi == t_pseudo$theta[, "e.phi"]
+## cLOS$e.phi.weights.1 == t_pseudo$theta[, "e.phi.weights.1"]
+## cLOS$e.phi.weights.other == t_pseudo$theta[, "e.phi.weights.other"]
 
-mean(t_pseudo$pseudoData$ps.e.phi)
+## mean(t_pseudo$pseudoData$ps.e.phi)
 
-### tests on etmprep
+## ### tests on etmprep
 
-### creation of fake data in the wild format, following an illness-death model
-## transition times
-tdisease <- c(3, 4, 3, 6, 8, 9)
-tdeath <- c(6, 9, 8, 6, 8, 9)
+## ### creation of fake data in the wild format, following an illness-death model
+## ## transition times
+## tdisease <- c(3, 4, 3, 6, 8, 9)
+## tdeath <- c(6, 9, 8, 6, 8, 9)
 
-## transition status
-stat.disease <- c(1, 1, 1, 0, 0, 0)
-stat.death <- c(1, 1, 1, 1, 1, 0)
+## ## transition status
+## stat.disease <- c(1, 1, 1, 0, 0, 0)
+## stat.death <- c(1, 1, 1, 1, 1, 0)
 
-## a covariate that we want to keep in the new data
-set.seed(1313)
-cova <- rbinom(6, 1, 0.5)
+## ## a covariate that we want to keep in the new data
+## set.seed(1313)
+## cova <- rbinom(6, 1, 0.5)
 
-dat <- data.frame(tdisease, tdeath,
-                  stat.disease, stat.death,
-                  cova)
+## dat <- data.frame(tdisease, tdeath,
+##                   stat.disease, stat.death,
+##                   cova)
 
-## Possible transitions
-tra <- matrix(FALSE, 3, 3)
-tra[1, 2:3] <- TRUE
-tra[2, 3] <- TRUE
+## ## Possible transitions
+## tra <- matrix(FALSE, 3, 3)
+## tra[1, 2:3] <- TRUE
+## tra[2, 3] <- TRUE
 
-## data preparation
-newdat <- etmprep(c(NA, "tdisease", "tdeath"),
-                  c(NA, "stat.disease", "stat.death"),
-                  data = dat, tra = tra,
-                  cens.name = "cens", keep = "cova")
+## ## data preparation
+## newdat <- etmprep(c(NA, "tdisease", "tdeath"),
+##                   c(NA, "stat.disease", "stat.death"),
+##                   data = dat, tra = tra,
+##                   cens.name = "cens", keep = "cova")
 
-newdat
+## newdat
 
-ref <- data.frame(id = c(1, 1, 2, 2, 3, 3, 4, 5, 6),
-                  entry = c(0, 3, 0, 4, 0, 3, 0, 0, 0),
-                  exit = c(3, 6, 4, 9, 3, 8, 6, 8, 9),
-                  from = c(0, 1, 0, 1, 0, 1, 0, 0, 0),
-                  to = c(rep(c(1, 2), 3), 2, 2, "cens"),
-                  cova = c(1, 1, 0, 0, 1, 1, 0, 1, 1))
-ref$from <- factor(as.character(ref$from), levels = c("0", "1", "2", "cens"))
-ref$to <- factor(as.character(ref$to), levels = c("0", "1", "2", "cens"))
+## ref <- data.frame(id = c(1, 1, 2, 2, 3, 3, 4, 5, 6),
+##                   entry = c(0, 3, 0, 4, 0, 3, 0, 0, 0),
+##                   exit = c(3, 6, 4, 9, 3, 8, 6, 8, 9),
+##                   from = c(0, 1, 0, 1, 0, 1, 0, 0, 0),
+##                   to = c(rep(c(1, 2), 3), 2, 2, "cens"),
+##                   cova = c(1, 1, 0, 0, 1, 1, 0, 1, 1))
+## ref$from <- factor(as.character(ref$from), levels = c("0", "1", "2", "cens"))
+## ref$to <- factor(as.character(ref$to), levels = c("0", "1", "2", "cens"))
 
-all.equal(ref, newdat)
+## all.equal(ref, newdat)
