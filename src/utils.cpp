@@ -140,6 +140,10 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
 	}
     }
 
+    // "symmetrize the matrix
+    the_cov = the_cov + the_cov.t();
+    the_cov.diag() /= 2;
+
     return the_cov;
 }
 		    
