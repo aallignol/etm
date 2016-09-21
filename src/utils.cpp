@@ -146,6 +146,7 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
 	}
     }
 
+    // Alternative algorithm, just fill the lower triamgular part of the matrix. Then
     // "symmetrize the matrix
     // the_cov = the_cov + the_cov.t();
     // the_cov.diag() /= 2;
