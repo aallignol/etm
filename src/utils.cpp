@@ -113,7 +113,9 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
 		int cond = 1 * (from[i] == to[i] && from[i] == from[j] && from[j] == to[j]) +
 		    2 * (from[i] == to[i] && from[i] == from[j] && from[i] != to[j]) +
 		    4 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] == to[j]) +
-		    8 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] != to[j]);
+		    8 * (from[i] == from[j] && from[i] != to[i] && from[i] != to[j] && to[i] != to[j]) +
+		    // add a condition for the symmetric of cond 2
+		    16 * (from[j] == to[j] && from[i] == from[j] && from[i] != to[i]);
 		
 		switch(cond) {
 		case 1:
@@ -132,6 +134,10 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
 		    the_cov(i, j) =  -nev(from[i], to[i]) *
 			nev(from[i], to[j]) * pow_nrisk[from[i]];
 		    break;
+		case 16:
+		    the_cov(i, j) = -(nrisk[from[i]] - sum_nev[from[i]]) *
+			nev(from[i], to[i]) * pow_nrisk[from[i]];
+		    break;
 		default:
 		    the_cov(i, j) = 0;
 		}
@@ -141,8 +147,11 @@ mat cov_dna(const mat & nev, const vec & nrisk, int d, int D) {
     }
 
     // "symmetrize the matrix
-    the_cov = the_cov + the_cov.t();
-    the_cov.diag() /= 2;
+    // the_cov = the_cov + the_cov.t();
+    // the_cov.diag() /= 2;
+
+//    Rcpp::Rcout << "cov_dna is" << std::endl << the_cov << std::endl;
+//    Rcpp::Rcout << "cov_dna[2,5] is" << std::endl << the_cov(1, 4) << std::endl;
 
     return the_cov;
 }
