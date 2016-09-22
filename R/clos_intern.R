@@ -73,6 +73,7 @@ clos.cp <- function(x, aw, ratio) {
     phi3 <- matrix(data=c(x$time, rep(0, dims[3]), rep(0, dims[3])),
                    ncol=3, byrow=FALSE)
     ind.cens <- apply(x$n.event, 3, function(r) all(r == 0))
+    times <- x$time
     tau <- max(x$time)
     
     out <- .Call("los_cp",

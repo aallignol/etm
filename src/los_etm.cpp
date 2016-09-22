@@ -98,13 +98,6 @@ RcppExport SEXP los_cp(SEXP __times,
 	aj.slice(i).eye();
     }
 
-    cube aj(nstate, nstate, lt);
-
-    for (int i = 0; i < lt; ++i) {
-	tr_mat.slice(i) = tr_mat.slice(i) + I;
-	aj.slice(i).eye();
-    }
-
     vec los0(lt), los1(lt), a00(lt), a11(lt), a01(lt), a12(lt), a13(lt),
 	phi2case(lt), phi2control(lt),
 	phi3case(lt), phi3control(lt);
@@ -141,11 +134,11 @@ RcppExport SEXP los_cp(SEXP __times,
 	los0[t] = T[t+1] + as_scalar(dd.t() * a);
 	los1[t] = T[t+1] + as_scalar(dd.t() * b);
 
-	phi2case[t] = T[t + 1]  * tr_mat(1, 2, t + 1) - as_scalar(dd.t() * c);
-	phi3case[t] = T[t + 1]  * tr_mat(1, 3, t + 1) - as_scalar(dd.t() * d);
+	phi2case[t] = T[lt - 1]  * aj(1, 2, lt - 1) - as_scalar(dd.t() * c);
+	phi3case[t] = T[lt - 1]  * aj(1, 3, lt - 1) - as_scalar(dd.t() * d);
 
-	phi2control[t] = tr_mat(1, 2, t + 1) * los0[t];	
-	phi3control[t] = tr_mat(1, 3, t + 1) * los0[t];
+	phi2control[t] = aj(1, 2, lt - 1) * los0[t];	
+	phi3control[t] = aj(1, 3, lt - 1) * los0[t];
     }
 
     return Rcpp::List::create(Rcpp::Named("los0") = los0,

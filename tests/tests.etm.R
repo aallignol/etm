@@ -147,23 +147,23 @@ all.equal(aa$"0 1"$P, as.vector(trprob(cif.control, "0 1")))
 
 ### test on los data
 
-## data(los.data) # in package changeLOS
+data(los.data) # in package changeLOS
 
-## ## putting los.data in the long format (see changeLOS)
-## my.observ <- prepare.los.data(x=los.data)
+## putting los.data in the long format (see changeLOS)
+my.observ <- prepare.los.data(x=los.data)
 
-## tra <- matrix(FALSE, 4, 4)
-## tra[1, 2:4] <- TRUE
-## tra[2, 3:4] <- TRUE
+tra <- matrix(FALSE, 4, 4)
+tra[1, 2:4] <- TRUE
+tra[2, 3:4] <- TRUE
 
-## tr.prob <- etm(my.observ, c("0","1","2","3"), tra, NULL, 0)
+tr.prob <- etm(my.observ, c("0","1","2","3"), tra, NULL, 0)
 
-## tr.prob
-## summary(tr.prob)
+tr.prob
+summary(tr.prob)
 
-## cLOS <- etm::clos(tr.prob, aw = TRUE)
+cLOS <- etm::clos(tr.prob, aw = FALSE)
 
-## cLOS
+cLOS
 
 
 ## ### Tests on pseudo values
