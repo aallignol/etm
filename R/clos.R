@@ -23,8 +23,8 @@ clos.etm <- function(x, aw = FALSE, ratio = FALSE, ...) {
     ## I <- diag(1, dims[1])
     ## tr.mat <- array(apply(x$delta.na, 3, "+", I), dim = dims)
     if (comp.risk) {
-        ## res <- clos.cp(x, tr.mat, aw, ratio)
-        stop("not yet")
+        res <- clos.cp(x, aw, ratio)
+        ## stop("not yet")
     }
     else res <- clos.nocp(x, aw, ratio)
     
