@@ -36,6 +36,8 @@ clos.nocp <- function(x, aw, ratio) {
     
     e.phi.w1 <- e.phi.w2 <- my.weights1 <- my.weights2 <- NULL
     if (aw) {
+        I <- diag(1, dims[1])
+        tr.mat <- array(apply(x$delta.na, 3, "+", I), dim = dims)
         cif1 <- cumsum(c(1, x$est[1, 1, 1:(dims[3] - 1)]) * tr.mat[1, 2, ])
         my.weights1 <- diff(c(0, cif1[indi])) / cif1[length(cif1)]
         cif2 <- cumsum(c(1, x$est[1, 1, 1:(dims[3] - 1)]) * tr.mat[1, 3, ])
@@ -110,6 +112,8 @@ clos.cp <- function(x, aw, ratio) {
     
     e.phi.w1 <- e.phi.w23 <- my.weights1 <- my.weights23 <- NULL
     if (aw) {
+        I <- diag(1, dims[1])
+        tr.mat <- array(apply(x$delta.na, 3, "+", I), dim = dims)
         cif1 <- cumsum(c(1, x$est[1, 1, 1:(dims[3] - 1)]) * tr.mat[1, 2, ])
         my.weights1 <- diff(c(0, cif1[indi])) / cif1[length(cif1)]
         cif23 <- cumsum(c(1, x$est[1, 1, 1:(dims[3] - 1)]) *

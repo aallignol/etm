@@ -161,7 +161,7 @@ tr.prob <- etm(my.observ, c("0","1","2","3"), tra, NULL, 0)
 tr.prob
 summary(tr.prob)
 
-cLOS <- etm::clos(tr.prob, aw = FALSE)
+cLOS <- etm::clos(tr.prob, aw = TRUE)
 
 cLOS
 
