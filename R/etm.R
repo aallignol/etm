@@ -5,7 +5,7 @@ etm <- function(x, ...) {
 
 etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
                            covariance = TRUE, delta.na = TRUE, modif = FALSE,
-                           c = 1, alpha = NULL, strat_variable) {
+                           c = 1, alpha = NULL, strat_variable, ...) {
 
     if (missing(x))
         stop("Argument 'x' (the data) is missing with no default")
