@@ -76,4 +76,23 @@ transfo_to_counting <- function(df) {
     return(df)
 }
 
-    
+### Product integration
+prodint <- function(dna, times, first, last, indi) {
+    I <- array(0, dim=dim(dna)[c(1, 2)])
+    diag(I) <- 1
+    if (first >= last) {
+        est <- array(I, dim=c(dim(dna)[c(1, 2)], 1))
+        time <- NULL
+    } else {
+        est <- array(0, dim=c(dim(dna)[c(1, 2)], (last-first+1)))
+        est[, , 1] <- I + dna[, , first] * indi[1]
+        j <- 2
+        for (i in (first + 1):last) {
+            est[, , j] <- est[, , j-1] %*% (I + dna[, , i] * indi[j])
+            j <- j + 1
+        }
+        time <- times[first:last]
+    }
+    list(est=est, time=time)
+}
+

@@ -43,12 +43,12 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
         ylim <- c(0, 1)
     }
 
-    plot(xlim, ylim, xlab = xlab, ylab = ylab,
-         xlim = xlim, ylim = ylim, type = "n", ...)
+    graphics::plot(xlim, ylim, xlab = xlab, ylab = ylab,
+                   xlim = xlim, ylim = ylim, type = "n", ...)
 
     for (i in seq_len(lt)) {
-        lines(temp[[i]]$time, temp[[i]]$P, type = "s",
-              col = col[i], lty = lty[i], ...)
+        graphics::lines(temp[[i]]$time, temp[[i]]$P, type = "s",
+                        col = col[i], lty = lty[i], ...)
     }
 
     if (conf.int && !is.null(x$cov)) {
@@ -57,10 +57,10 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
         if (length(ci.lty) < lt)
             ci.lty <- ci.lty * rep(1, lt)
         for (i in seq_len(lt)) {
-            lines(temp[[i]]$time, temp[[i]]$lower, type = "s",
-                  col = ci.col[i], lty = ci.lty[i], ...)
-            lines(temp[[i]]$time, temp[[i]]$upper, type = "s",
-                  col = ci.col[i], lty = ci.lty[i], ...)
+            graphics::lines(temp[[i]]$time, temp[[i]]$lower, type = "s",
+                            col = ci.col[i], lty = ci.lty[i], ...)
+            graphics::lines(temp[[i]]$time, temp[[i]]$upper, type = "s",
+                            col = ci.col[i], lty = ci.lty[i], ...)
         }
     }
 

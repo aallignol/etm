@@ -11,7 +11,7 @@
 \usage{
 \S3method{etm}{data.frame}(x, state.names, tra, cens.name, s, t = "last",
     covariance = TRUE, delta.na = TRUE, modif = FALSE,
-    c = 1, alpha = NULL, strat_variable)
+    c = 1, alpha = NULL, strat_variable, ...)
 }
 \arguments{
   \item{x}{data.frame of the form data.frame(id,from,to,time)
@@ -53,6 +53,7 @@
     modification discards the event times for which \eqn{Y(t) \geq
       t}{Y(t) >= t}. Otherwise \eqn{cn^\alpha}{cn^alpha} is used. It is
     recommanded to let \code{alpha} equal NULL for multistate models.}
+  \item{...}{Not used}
 }
 \details{
   Data are considered to arise from a time-inhomogeneous Markovian

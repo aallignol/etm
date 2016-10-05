@@ -15,22 +15,22 @@ plot.clos.etm <- function(x, xlab = "Time",
     if (missing(ylim.w)) {
         ylim.w <- c(0, max(x$weights))
     }
-    def.par <- par(no.readonly = TRUE)
+    def.par <- graphics::par(no.readonly = TRUE)
     on.exit(par(def.par))
-    split.screen(figs=matrix(c(rep(0,2), rep(1,2), c(0, 0.6), c(0.7, 1)), ncol=4))
+    graphics::split.screen(figs=matrix(c(rep(0,2), rep(1,2), c(0, 0.6), c(0.7, 1)), ncol=4))
     screen(2)
-    op <- par(mar=c(2, 5, 2, 1))
-    plot(c(0,x$w.time), c(0, x$weights), type = "s", axes = FALSE, lty = lty.w, xlim = xlim,
-         ylim = ylim.w , xlab = xlab , ylab = ylab.w, col=col.w, ...)
-    axis(side=2)
-    box()
-    par(op)
-    screen(1)      
-    op <- par(mar=c(5, 5, 4, 1))
-    plot(x$time, x$phi.case, type = "s", lty = lty.e[1], xlim = xlim,
-         ylim = ylim.e, xlab = xlab, ylab = ylab.e, col = col.e[1], ...)
-    lines(x$time, x$phi.control, type = "s", lty = lty.e[2], col = col.e[2], ...)
-    par(op)
+    op <- graphics::par(mar=c(2, 5, 2, 1))
+    graphics::plot(c(0,x$w.time), c(0, x$weights), type = "s", axes = FALSE, lty = lty.w, xlim = xlim,
+                   ylim = ylim.w , xlab = xlab , ylab = ylab.w, col=col.w, ...)
+    graphics::axis(side=2)
+    graphics::box()
+    graphics::par(op)
+    graphics::screen(1)      
+    op <- graphics::par(mar=c(5, 5, 4, 1))
+    graphics::plot(x$time, x$phi.case, type = "s", lty = lty.e[1], xlim = xlim,
+                   ylim = ylim.e, xlab = xlab, ylab = ylab.e, col = col.e[1], ...)
+    graphics::lines(x$time, x$phi.control, type = "s", lty = lty.e[2], col = col.e[2], ...)
+    graphics::par(op)
     if (legend == TRUE) {
         if (missing(legend.pos))
             legend.pos <- "bottomright"
@@ -51,6 +51,6 @@ plot.clos.etm <- function(x, xlab = "Time",
         do.call("legend", c(list(xx, yy, curvlab, col = col.e, lty = lty.e, bty = legend.bty),
                             args[!is.na(ii)]))
     }
-    close.screen(all.screens = TRUE)
+    graphics::close.screen(all.screens = TRUE)
     invisible()
 }

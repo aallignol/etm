@@ -1,6 +1,9 @@
 useDynLib(etm)
 importFrom(Rcpp, evalCpp)
 import(lattice, survival, parallel, data.table)
+importFrom("graphics", "axis", "box", "close.screen", "lines", "par",
+           "plot", "screen", "split.screen")
+importFrom("stats", "qnorm", "quantile")
 export(etm, clos, tra_ill, tra_ill_comp, tra_comp, tra_surv, prepare.los.data, trprob, trcov)
 S3method(etm, data.frame)
 S3method(clos, msfit)

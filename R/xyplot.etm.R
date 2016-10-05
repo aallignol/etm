@@ -34,12 +34,12 @@ xyplot.etm <- function(x, data = NULL, tr.choice, col = c(1, 1, 1), lty = c(1, 3
     temp$cov <- factor(temp$cov, levels = tr.choice)
     
     if (conf.int) {
-        aa <- xyplot(temp$P + temp$lower + temp$upper ~ temp$time | temp$cov,
-                     type = "s", col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+        aa <- lattice::xyplot(temp$P + temp$lower + temp$upper ~ temp$time | temp$cov,
+                              type = "s", col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
     }
     else {
-        aa <- xyplot(temp$P ~ temp$time | temp$cov, type = "s",
-                     col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+        aa <- lattice::xyplot(temp$P ~ temp$time | temp$cov, type = "s",
+                              col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
     }
     
     aa

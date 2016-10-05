@@ -16,7 +16,7 @@ pseudo_values.data.frame <- function(x,
                                      s = 0,
                                      t, ...)
 {
-                                     
+    
     ## All the data verifications
     ##
     ##
@@ -101,7 +101,7 @@ pseudo_values.data.frame <- function(x,
                 s,
                 t,
                 covariance = FALSE,
-                c_modif = 0)
+                const_modif = 0)
 
     ## Find at which times (index of time) the ind are at risk
     span_entry <- x[, findInterval(entry, zzz$time, all.inside = FALSE) + 1]
@@ -109,4 +109,6 @@ pseudo_values.data.frame <- function(x,
 
     ## Go to C++
 
+
+    invisible()
 }

@@ -6,7 +6,7 @@
   associated with an intermediate event.
 }
 \usage{
-clos(x, aw = FALSE, ratio = FALSE)
+clos(x, aw = FALSE, ratio = FALSE, ...)
 }
 \arguments{
   \item{x}{An object of class \code{etm}. Argument \code{delta.na} in
@@ -17,6 +17,7 @@ clos(x, aw = FALSE, ratio = FALSE)
   \item{ratio}{Logical. Compute the ratio of the expected length-of-stay
     given instermediate event status instead of a difference. Default
     value is \code{FALSE}}
+  \item{...}{Not used}
 }
 
 \details{
