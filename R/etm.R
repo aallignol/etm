@@ -70,7 +70,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     names_msm <- intersect(c("id", "entry", "exit", "time", "from", "to", strat_var), reg)
     x <- x[, names_msm, with = FALSE]
 
-### Work through the stratification variables
+    ## Work through the stratification variables
     combi <- unique(x[, strat_var, with = FALSE])
     if (length(strat_var) == 1) {
         conditions <- lapply(seq_len(nrow(combi)), function(i) {
@@ -86,7 +86,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
                              })
     }
 
-### transitions
+    ## transitions
     colnames(tra) <- rownames(tra) <- state.names
     t.from <- lapply(1:dim(tra)[2], function(i) {
         rep(rownames(tra)[i], sum(tra[i, ]))
@@ -130,7 +130,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         levels(x$to) <- 1:length(state.names)
     }
 
-### if not, put like counting process data
+    ## if not, put like counting process data
     if ("time" %in% names(x)) {
         setorder(x, id, time)
         x[, idd := as.integer(id)]
@@ -191,30 +191,34 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
                     t,
                     covariance,
                     c_modif)
-        
+
         nrisk <- zzz$n.risk
-        colnames(nrisk) <- state.names
-        nrisk <- nrisk[, !(colnames(nrisk) %in%
-                             setdiff(unique(trans$to), unique(trans$from))),
-                       drop = FALSE]
-        
+
         est <- zzz$est
         nev <- zzz$n.event
         var_aj <- zzz$cov
-        
-        dimnames(est) <- list(state.names, state.names, zzz$time)
-        dimnames(nev) <- list(state.names, state.names, zzz$time)
 
-        if (covariance) {
-            pos <- sapply(1:length(state.names), function(i) {
-                              paste(state.names, state.names[i])
-                          })
-            pos <- matrix(pos)
-            dimnames(var_aj) <- list(pos, pos, zzz$time)
+        if (!is.null(zzz$n.risk)) {
+            colnames(nrisk) <- state.names
+            nrisk <- nrisk[, !(colnames(nrisk) %in%
+                               setdiff(unique(trans$to), unique(trans$from))),
+                           drop = FALSE]
+            dimnames(est) <- list(state.names, state.names, zzz$time)
+            dimnames(nev) <- list(state.names, state.names, zzz$time)
+        
+            if (covariance) {
+                pos <- sapply(1:length(state.names), function(i) {
+                    paste(state.names, state.names[i])
+                })
+                pos <- matrix(pos)
+                dimnames(var_aj) <- list(pos, pos, zzz$time)
+            } else {
+                var_aj <- NULL
+            }
         } else {
             var_aj <- NULL
         }
-
+        
         
         res <- list(est = est,
                     cov = var_aj,
