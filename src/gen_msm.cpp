@@ -58,7 +58,9 @@ RcppExport SEXP gen_msm(SEXP _times,
     cube dna(nstate, nstate, lt); dna.zeros();
 
     if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
-    nrisk(1, from_exit[0] - 1) -= 1;
+    if (n > 1) {
+	nrisk(1, from_exit[0] - 1) -= 1;
+    }
 
     // the events
     int t = 0;
