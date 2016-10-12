@@ -50,3 +50,8 @@ aa <- etm(sir.cont, c("0", "1", "2"), tra, "cens", s=0, t=1) #--> unity matrix e
 aa <- etm(sir.cont, c("0", "1", "2"), tra, "cens", s=165)
 
 subset(sir.cont,time > 165)
+
+
+trprob(fit.etm, "0 0", 0) # should return 1
+
+

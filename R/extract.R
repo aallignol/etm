@@ -7,18 +7,21 @@ trcov <- function(x, ...) {
 }
 
 trprob.etm <- function(x, tr.choice, timepoints, ...) {
+    
     if (!inherits(x, "etm"))
         stop("'x' must be a 'etm' object")
     if (!is.character(tr.choice))
         stop("'tr.choice' must be a character vector")
     if (length(tr.choice) != 1)
         stop("The function only extracts 1 transition probability")
+    
     pos <- sapply(1:length(x$state.names), function(i) {
         paste(x$state.names, x$state.names[i])
     })
     pos <- matrix(pos)
     if (!(tr.choice %in% pos))
         stop("'tr.choice' not in the possible transitions")
+    
     trans.sep <- strsplit(tr.choice, " ")
     if (length(trans.sep[[1]]) != 2) {
         tt <- charmatch(trans.sep[[1]], x$state.names, nomatch = 0)
@@ -28,12 +31,15 @@ trprob.etm <- function(x, tr.choice, timepoints, ...) {
 
     if (missing(timepoints)) {
         tmp <- x$est[trans.sep[1], trans.sep[2], ]
-    }
-    else {
+
+    } else {
         ind <- findInterval(timepoints, x$time)
         tmp <- numeric(length(timepoints))
         place <- which(ind != 0)
+        noplace <- which(ind == 0)
         tmp[place] <- x$est[trans.sep[1], trans.sep[2], ind]
+        if (trans.sep[1] == trans.sep[2])
+            tmp[noplace] <- 1
     }
     tmp
 }
