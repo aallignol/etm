@@ -62,23 +62,36 @@ RcppExport SEXP gen_msm(SEXP _times,
 
     // the events
     int t = 0;
-    for (int i = 1; i<n; ++i) {
-	
-	if (exit[i] == exit[i - 1]) {
-	    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-	    if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
-	} else {
-	    if (t < lt - 1) {
-		if (exit[i] == times[t+1]) {
-		    ++t;
-		    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-		    if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
-		} else {
-		    if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
-		}
-	    }
-	    else {
+    
+    if (lt == 1) {
+	for (int i = 1; i<n; ++i) {
+	    if (exit[i] == exit[i - 1]) {
 		if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+	    } else {
+		break;
+	    }
+	}
+	
+    } else {
+
+	for (int i = 1; i<n; ++i) {
+	
+	    if (exit[i] == exit[i - 1]) {
+		if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+		if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
+	    } else {
+		if (t < lt - 1) {
+		    if (exit[i] == times[t+1]) {
+			++t;
+			if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+			if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
+		    } else {
+			if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
+		    }
+		}
+		else {
+		    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+		}
 	    }
 	}
     }

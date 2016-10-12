@@ -154,11 +154,13 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     if (t=="last") t <- max(x$exit)
     if (!(0 <= s & s < t))
         stop("'s' and 't' must be positive, and s < t")
-    if (t <= x[, min(exit)] | s >= x[, max(exit)])
+    if (t < x[, min(exit)] | s >= x[, max(exit)])
         stop("'s' or 't' is an invalid time")
 
     ## remove the lines in which transition before s
     x <- x[exit > s]
+    ## remove the entries after t
+    x <- x[entry < t]
 
     ## The Lai and Ying modification (if any)
     if (modif) {
@@ -198,6 +200,8 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         nev <- zzz$n.event
         var_aj <- zzz$cov
 
+        dimnames(est) <- list(state.names, state.names, zzz$time)
+        
         if (!is.null(zzz$n.risk)) {
             colnames(nrisk) <- state.names
             nrisk <- nrisk[, !(colnames(nrisk) %in%
@@ -218,7 +222,6 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         } else {
             var_aj <- NULL
         }
-        
         
         res <- list(est = est,
                     cov = var_aj,
