@@ -1,12 +1,16 @@
 \name{clos}
 \alias{clos}
+\alias{clos.etm}
+\alias{clos.msfit}
 \title{Change in Length of Stay}
 \description{
   The function estimates the expected change in length of stay (LOS)
   associated with an intermediate event.
 }
 \usage{
-clos(x, aw = FALSE, ratio = FALSE, ...)
+clos(x, aw, ratio, ...)
+\S3method{clos}{etm}(x, aw = FALSE, ratio = FALSE, ...)
+\S3method{clos}{msfit}(x, aw = FALSE, ratio = FALSE, cox_model, ...)
 }
 \arguments{
   \item{x}{An object of class \code{etm}. Argument \code{delta.na} in
@@ -17,7 +21,8 @@ clos(x, aw = FALSE, ratio = FALSE, ...)
   \item{ratio}{Logical. Compute the ratio of the expected length-of-stay
     given instermediate event status instead of a difference. Default
     value is \code{FALSE}}
-  \item{...}{Not used}
+  \item{cox_model}{TODO}
+  \item{...}{Further arguments}
 }
 
 \details{

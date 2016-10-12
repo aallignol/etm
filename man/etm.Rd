@@ -53,6 +53,7 @@
     modification discards the event times for which \eqn{Y(t) \geq
       t}{Y(t) >= t}. Otherwise \eqn{cn^\alpha}{cn^alpha} is used. It is
     recommanded to let \code{alpha} equal NULL for multistate models.}
+  \item{strat_variable}{TODO}
   \item{...}{Not used}
 }
 \details{

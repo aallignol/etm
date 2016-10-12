@@ -5,7 +5,7 @@
   Print method for objects of class \code{etm}.
 }
 \usage{
-\S3method{print}{etm}(x, covariance = TRUE, whole = TRUE, ...)
+\S3method{print}{etm}(x, covariance = FALSE, whole = TRUE, ...)
 }
 \arguments{
   \item{x}{An object of class \code{etm}.}

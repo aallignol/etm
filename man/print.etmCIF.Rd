@@ -1,7 +1,7 @@
 \name{print.etmCIF}
 \alias{print.etmCIF}
 \title{
-  Print function for cifETM objects
+  Print function for \code{cifETM} objects
 }
 \description{
     Print method for \code{cifETM} objects

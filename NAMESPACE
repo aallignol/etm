@@ -1,10 +1,24 @@
 useDynLib(etm)
+
 importFrom(Rcpp, evalCpp)
+
 import(lattice, survival, parallel, data.table)
+
 importFrom("graphics", "axis", "box", "close.screen", "lines", "par",
            "plot", "screen", "split.screen")
-importFrom("stats", "qnorm", "quantile")
-export(etm, clos, tra_ill, tra_ill_comp, tra_comp, tra_surv, prepare.los.data, trprob, trcov)
+importFrom("stats", "qnorm", "quantile", "model.extract")
+
+export(etm,
+       clos,
+       tra_ill,
+       tra_ill_comp,
+       tra_comp,
+       tra_surv,
+       prepare.los.data,
+       trprob,
+       trcov,
+       etmCIF)
+
 S3method(etm, data.frame)
 S3method(clos, msfit)
 S3method(clos, etm)
@@ -18,6 +32,10 @@ S3method(plot, etm)
 S3method(lines, etm)
 S3method(trprob, etm)
 S3method(trcov, etm)
+S3method(print, etmCIF)
+S3method(plot, etmCIF)
+S3method(summary, etmCIF)
+S3method(print, summary.etmCIF)
 
 
 ## exportPattern("^[[:alpha:]]+")
