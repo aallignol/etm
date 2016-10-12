@@ -57,20 +57,23 @@ RcppExport SEXP gen_msm(SEXP _times,
     cube nev(nstate, nstate, lt); nev.zeros();
     cube dna(nstate, nstate, lt); dna.zeros();
 
-    if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
-    if (n > 1) {
-	nrisk(1, from_exit[0] - 1) -= 1;
-    }
+    // if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
+    // if (n > 1) {
+    // 	nrisk(1, from_exit[0] - 1) -= 1;
+    // }
 
     // the events
     int t = 0;
     
     if (lt == 1) {
-	for (int i = 1; i<n; ++i) {
-	    if (exit[i] == exit[i - 1]) {
-		if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-	    } else {
-		break;
+	if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
+	if (n > 1) {
+	    for (int i = 1; i<n; ++i) {
+		if (exit[i] == exit[i - 1]) {
+		    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
+		} else {
+		    break;
+		}
 	    }
 	}
 	
