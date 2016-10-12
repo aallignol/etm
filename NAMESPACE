@@ -5,7 +5,7 @@ importFrom(Rcpp, evalCpp)
 import(lattice, survival, parallel, data.table)
 
 importFrom("graphics", "axis", "box", "close.screen", "lines", "par",
-           "plot", "screen", "split.screen")
+           "plot", "screen", "split.screen", "segments")
 importFrom("stats", "qnorm", "quantile", "model.extract")
 
 export(etm,
@@ -17,7 +17,8 @@ export(etm,
        prepare.los.data,
        trprob,
        trcov,
-       etmCIF)
+       etmCIF,
+       etmprep)
 
 S3method(etm, data.frame)
 S3method(clos, msfit)

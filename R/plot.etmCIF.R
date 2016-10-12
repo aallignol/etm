@@ -78,10 +78,10 @@ plot.etmCIF <- function(x, which.cif, xlim, ylim,
 
             if (ci.type == "bars") {
                 ind <- findInterval(pos.ci[i], summx[[i]][[tr.choice[j]]]$time)
-                segments(pos.ci[i], summx[[i]][[tr.choice[j]]]$lower[ind],
-                         pos.ci[i], summx[[i]][[tr.choice[j]]]$upper[ind], 
-                         lwd = ci.lwd, col = ci.col[j + (i - 1) * n.what],
-                         lty = ci.lty[j + (i - 1) * n.what],...)
+                graphics::segments(pos.ci[i], summx[[i]][[tr.choice[j]]]$lower[ind],
+                                   pos.ci[i], summx[[i]][[tr.choice[j]]]$upper[ind], 
+                                   lwd = ci.lwd, col = ci.col[j + (i - 1) * n.what],
+                                   lty = ci.lty[j + (i - 1) * n.what],...)
             }
         }
     }
