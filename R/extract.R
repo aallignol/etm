@@ -77,12 +77,15 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
 ### For the stratified etm ###
 ##############################
 
-"[.etm.stratified" <- function(x, ..., time, drop = FALSE) {
+"[.etm" <- function(x, ..., drop = FALSE) {
 
     if (missing(..1)) i <- NULL else i <- ..1
 
     ## No subscript, do nothing
     if (is.null(i)) return(x)
+
+    ## No strata, do nothing
+    if (is.null(x$strata_variable)) return(x)
 
     if (is.character(i)) {
         ind <- match(gsub(" ", "", i, fixed = TRUE),
@@ -116,7 +119,7 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         res$data <- x$data
         res$strat_variable <- x$strata_variable
         res$strata <- x$strata[ind]
-        class(res) <- "etms.tratified"
+        class(res) <- "etm"
 
     }
 
