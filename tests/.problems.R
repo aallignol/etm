@@ -16,6 +16,10 @@ test <- etm(dt, c("0", "1", "2"), tra_ill(), "cens", s = 87, t = 88.1)
 dt[exit > 87]
 
 
+### Get there because we have covariates
+test <- etm(dt, c("0", "1", "2"), tra_ill(), "cens", s = 0, strat_variable = "sex")
+
+
 ######################################################################
 library(etm)
 data(sir.cont)

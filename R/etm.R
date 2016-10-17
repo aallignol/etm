@@ -9,6 +9,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
 
     if (missing(x))
         stop("Argument 'x' (the data) is missing with no default")
+    x <- data.table(x)
     if (missing(tra))
         stop("Argument 'tra' is missing with no default")
     if (missing(state.names))
@@ -43,12 +44,13 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     ## The stratification variable
     if (missing(strat_variable)) {
         strat_var <- "X"
-        x$X <- 1
+        x$X <- "1"
         is_stratified <- FALSE
     } else {
         if (!all(strat_variable %in% names(x)))
             stop("Stratification variables not in data")
         strat_var <- strat_variable
+        x[, (strat_var) := lapply(.SD, as.character), .SDcols = strat_var]
         is_stratified <- TRUE
     }
 
@@ -63,9 +65,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         }
     }
 
-    ## Transform x to data.table and keep only the variables we need
-    x <- data.table(x)
-
+    ## keep only the variables we need
     reg <- names(x)
     names_msm <- intersect(c("id", "entry", "exit", "time", "from", "to", strat_var), reg)
     x <- x[, names_msm, with = FALSE]
@@ -74,13 +74,13 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     combi <- unique(x[, strat_var, with = FALSE])
     if (length(strat_var) == 1) {
         conditions <- lapply(seq_len(nrow(combi)), function(i) {
-                                 parse(text = paste0(strat_var, " == ", combi[i]))
+                                 parse(text = paste0(strat_var, " ==  '", combi[i], "'"))
                              })
     } else {
         conditions <- lapply(seq_len(nrow(combi)), function(i) {
                                  parse(text = paste(sapply(strat_var,
                                        function(j) {
-                                           paste0(j, "==", combi[i, j, with = FALSE])
+                                           paste0(j, "== '", combi[i, j, with = FALSE], "'")
                                        }),
                                        collapse = " & "))
                              })
@@ -242,7 +242,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         res$data <- x
         res$strata_variable <- strat_variable
         res$strata <- do.call('c', lapply(conditions, as.character))
-        class(res) <- "etm.stratified"
+        class(res) <- "etm"
     } else {
         res <- res[[1]]
         res$trans <- trans
