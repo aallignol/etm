@@ -108,7 +108,6 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         res$data <- x$data
         res$strat_variable <- x$strata_variable
         res$strata <- x$strata[ind]
-        class(res) <- "etm"
 
     } else {
 
@@ -119,56 +118,56 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         res$data <- x$data
         res$strat_variable <- x$strata_variable
         res$strata <- x$strata[ind]
-        class(res) <- "etm"
 
     }
 
+    class(res) <- "etm"
     res
 
 }
 
-trprob.etm.stratified <- function(x, tr.choice, timepoints, ...) {
+## trprob.etm.stratified <- function(x, tr.choice, timepoints, ...) {
     
-    if (!inherits(x, "etm.stratified"))
-        stop("'x' must be a 'etm.stratified' object")
-    if (!is.character(tr.choice))
-        stop("'tr.choice' must be a character vector")
-    if (length(tr.choice) != 1)
-        stop("The function only extracts 1 transition probability")
+##     if (!inherits(x, "etm.stratified"))
+##         stop("'x' must be a 'etm.stratified' object")
+##     if (!is.character(tr.choice))
+##         stop("'tr.choice' must be a character vector")
+##     if (length(tr.choice) != 1)
+##         stop("The function only extracts 1 transition probability")
     
-    pos <- sapply(1:length(x$state.names), function(i) {
-        paste(x$state.names, x$state.names[i])
-    })
-    pos <- matrix(pos)
+##     pos <- sapply(1:length(x$state.names), function(i) {
+##         paste(x$state.names, x$state.names[i])
+##     })
+##     pos <- matrix(pos)
     
-    if (!(tr.choice %in% pos))
-        stop("'tr.choice' not in the possible transitions")
+##     if (!(tr.choice %in% pos))
+##         stop("'tr.choice' not in the possible transitions")
     
-    trans.sep <- strsplit(tr.choice, " ")
+##     trans.sep <- strsplit(tr.choice, " ")
     
-    if (length(trans.sep[[1]]) != 2) {
-        tt <- charmatch(trans.sep[[1]], x$state.names, nomatch = 0)
-        trans.sep[[1]] <- x$state.names[tt]
-    }
-    trans.sep <- unlist(trans.sep)
+##     if (length(trans.sep[[1]]) != 2) {
+##         tt <- charmatch(trans.sep[[1]], x$state.names, nomatch = 0)
+##         trans.sep[[1]] <- x$state.names[tt]
+##     }
+##     trans.sep <- unlist(trans.sep)
 
-    is_missing_time <- missing(timepoints)
+##     is_missing_time <- missing(timepoints)
 
-    zzz <- lapply(seq_along(x$strata), function(i)
-    {
-        xx <- x[i]
+##     zzz <- lapply(seq_along(x$strata), function(i)
+##     {
+##         xx <- x[i]
 
-        if (is_missing_time) {
-            tmp <- xx$est[trans.sep[1], trans.sep[2], ]
-        } else {
-            ind <- findInterval(timepoints, xx$time)
-            tmp <- numeric(length(timepoints))
-            place <- which(ind != 0)
-            tmp[place] <- xx$est[trans.sep[1], trans.sep[2], ind]
-        }
-        tmp
-    })
+##         if (is_missing_time) {
+##             tmp <- xx$est[trans.sep[1], trans.sep[2], ]
+##         } else {
+##             ind <- findInterval(timepoints, xx$time)
+##             tmp <- numeric(length(timepoints))
+##             place <- which(ind != 0)
+##             tmp[place] <- xx$est[trans.sep[1], trans.sep[2], ind]
+##         }
+##         tmp
+##     })
     
-    names(zzz) <- x$strata
-    zzz
-}
+##     names(zzz) <- x$strata
+##     zzz
+## }

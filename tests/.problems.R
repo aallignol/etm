@@ -19,8 +19,14 @@ dt[exit > 87]
 ### Get there because we have covariates
 test <- etm(dt, c("0", "1", "2"), tra_ill(), "cens", s = 0, strat_variable = "sex")
 
+## test with 2 covariates
+
+dt[, age_cat := ifelse(age > median(age), 1, 0)]
+
+test2 <- etm(dt, c("0", "1", "2"), tra_ill(), "cens", s = 0, strat_variable = c("age_cat", "sex"))
 
 ######################################################################
+
 library(etm)
 data(sir.cont)
 # Modification for patients entering and leaving a state
@@ -29,11 +35,11 @@ data(sir.cont)
 # to happen before end of hospital stay
 sir.cont <- sir.cont[order(sir.cont$id, sir.cont$time), ]
 for (i in 2:nrow(sir.cont)) {
-  if (sir.cont$id[i]==sir.cont$id[i-1]) {
-    if (sir.cont$time[i]==sir.cont$time[i-1]) {
-      sir.cont$time[i-1] <- sir.cont$time[i-1] - 0.5
+    if (sir.cont$id[i]==sir.cont$id[i-1]) {
+        if (sir.cont$time[i]==sir.cont$time[i-1]) {
+            sir.cont$time[i-1] <- sir.cont$time[i-1] - 0.5
+        }
     }
-  }
 }
 ### Computation of the transition probabilities
 # Possible transitions.
