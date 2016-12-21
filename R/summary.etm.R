@@ -1,18 +1,23 @@
-summary.etm <- function(object, all = FALSE, ci.fun = "linear", level = 0.95, ...) {
+summary.etm <- function(object, all = FALSE, ci.fun = "linear", level = 0.95, times, ...) {
+    
     if (!inherits(object, "etm"))
         stop("'object' must be of class 'etm'")
+    
     if (is.null(object$time)) {
         res <- list(P = object$est, s = object$s, t = object$t)
         class(res) <- "summary.etm"
         return(res)
     }
+    
     if (level <= 0 | level > 1) {
         stop ("'level' must be between 0 and 1")
     }
+    
     ref <- c("linear", "log", "cloglog", "log-log")
     if (sum(ci.fun %in% ref == FALSE) != 0) {
         stop("'ci.fun' is not correct. See help page")
     }
+    
     if (all) {
         ind <- object$est != 0
         indi <- apply(ind, c(1, 2), function(temp){all(temp == FALSE)})
@@ -26,8 +31,9 @@ summary.etm <- function(object, all = FALSE, ci.fun = "linear", level = 0.95, ..
         absorb <- setdiff(levels(object$tran$to), levels(object$trans$from))
         for (i in seq_along(absorb))
             trs <- trs[-grep(paste("^", absorb[i], sep =""), trs, perl = TRUE)]
-    }
-    else {
+
+    } else {
+        
         dtrs <- diag(outer(object$state.names, object$state.names, paste))
         absorb <- setdiff(levels(object$tran$to), levels(object$trans$from))
         for (i in seq_along(absorb))
@@ -35,6 +41,7 @@ summary.etm <- function(object, all = FALSE, ci.fun = "linear", level = 0.95, ..
         tmp <- paste(object$trans[, 1], object$trans[, 2])
         trs <- c(tmp, dtrs)
     }
+    
     res <- ci.transfo(object, trs, level, ci.fun)
     class(res) <- "summary.etm"
     res
