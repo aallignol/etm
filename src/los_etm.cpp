@@ -49,7 +49,7 @@ RcppExport SEXP los_nocp(SEXP __times,
 	vec dd = my_diff(T(span(t+1, lt)));
 	
 	for (int j = t; j < lt; ++j) {
-	    aj.slice(j) = tr_mat.slice(t+1) * aj.slice(j);
+	    aj.slice(j) = aj.slice(j) * tr_mat.slice(t+1);
 	    a00(j) = aj(0, 0, j);
 	    a01(j) = aj(0, 1, j);
 	    a11(j) = aj(1, 1, j);
