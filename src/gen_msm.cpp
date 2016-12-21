@@ -1,5 +1,8 @@
 #define ARMA_NO_DEBUG
 
+// pbl in the new stuff for "1" event: Probably
+// does something weird when last data point with ties
+
 #include <RcppArmadillo.h>
 // #include <gperftools/profiler.h>
 
@@ -64,7 +67,9 @@ RcppExport SEXP gen_msm(SEXP _times,
 
     // the events
     int t = 0;
-    
+
+    // only one event time. And different code paths if 1 data point
+    // or more
     if (lt == 1) {
 	if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
 	if (n > 1) {
@@ -79,6 +84,11 @@ RcppExport SEXP gen_msm(SEXP _times,
 	
     } else {
 
+	if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
+	if (n > 1) {
+	    nrisk(1, from_exit[0] - 1) -= 1;
+	}
+
 	for (int i = 1; i<n; ++i) {
 	
 	    if (exit[i] == exit[i - 1]) {
@@ -91,7 +101,7 @@ RcppExport SEXP gen_msm(SEXP _times,
 			if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
 			if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
 		    } else {
-			if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
+			nrisk(t + 1, from_exit[i] - 1) -= 1;
 		    }
 		}
 		else {

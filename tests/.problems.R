@@ -65,3 +65,14 @@ subset(sir.cont,time > 165)
 trprob(fit.etm, "0 0", 0) # should return 1
 
 
+### New problems
+setwd("/data/Consulting/panorama/final/")
+
+source("init.R")
+
+load("data_ana/dt_panorama_complete.rda")
+## load("data_ana/dt_panorama_confirmed.rda")
+
+### TEST:
+aa <- etm(dt_panorama_complete, sn_diff, tra_diff,
+          '13', s = 0)
