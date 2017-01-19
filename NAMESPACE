@@ -6,7 +6,7 @@ import(lattice, survival, parallel, data.table)
 
 importFrom("graphics", "axis", "box", "close.screen", "lines", "par",
            "plot", "screen", "split.screen", "segments")
-importFrom("stats", "qnorm", "quantile", "model.extract")
+importFrom("stats", "qnorm", "quantile", "model.extract", "terms")
 
 export(etm,
        clos,
@@ -18,7 +18,8 @@ export(etm,
        trprob,
        trcov,
        etmCIF,
-       etmprep)
+       etmprep,
+       closPseudo)
 
 S3method(etm, data.frame)
 S3method(clos, msfit)
