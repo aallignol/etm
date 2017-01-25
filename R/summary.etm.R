@@ -1,4 +1,4 @@
-summary.etm <- function(object, all = FALSE, ci.fun = "linear", level = 0.95, times, ...) {
+summary.etm <- function(object, all = FALSE, ci.fun = "linear", level = 0.95, ...) {
     
     if (!inherits(object, "etm"))
         stop("'object' must be of class 'etm'")

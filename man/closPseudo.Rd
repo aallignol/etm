@@ -8,8 +8,11 @@
   Pseudo Value Regression for the Extra Length-of-Stay
 }
 \usage{
-closPseudo(data, state.names, tra, cens.name, s = 0, formula,
-           aw = FALSE, ratio = FALSE, ncores = 1, trick_ties = FALSE)
+closPseudo(data, state.names, tra, cens.name, s = 0,
+           formula, na.action,
+           aw = FALSE, ratio = FALSE,
+           ncores = 1,
+           trick_ties = FALSE)
 }
 \arguments{
   \item{data}{
@@ -33,7 +36,11 @@ closPseudo(data, state.names, tra, cens.name, s = 0, formula,
   \item{s}{Starting value for computing the transition probabilities.}
   \item{formula}{A formula with the covariates at the right of a
     \code{~} operator. Leave the left part empty.}
-  \item{aw}{Logical. Whether to compute the expected change of LOS using
+  \item{na.action}{A function which indicates what should happen when the data
+    contain 'NA's.  The default is set by the 'na.action' setting
+    of 'options', and is 'na.fail' if that is unset.  The
+    'factory-fresh' default is 'na.omit'.}
+    \item{aw}{Logical. Whether to compute the expected change of LOS using
     alternative weighting. Default is \code{FALSE}.}
   \item{ratio}{Logical. Compute the ratio of the expected length-of-stay
     given instermediate event status instead of a difference. Default
