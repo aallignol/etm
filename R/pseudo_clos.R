@@ -22,9 +22,8 @@ closPseudo <- function(data, state.names, tra, cens.name, s = 0,
     m$formula <- Terms
     m[[1]] <- as.name("model.frame")
     m <- eval(m, parent.frame())
-    
-    m <- data.table(m)
-    m[, id := data$id]
+
+    m <- data.table(cbind(id = data$id, m))
     
     n <- length(unique(data[, id]))
     
