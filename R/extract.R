@@ -51,9 +51,12 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         stop("'tr.choice' must be a character vector")
     if (!(length(tr.choice) %in% c(1, 2)))
         stop("'tr.choice' must be of length 1 or 2")
-        pos <- sapply(1:length(x$state.names), function(i) {
+    pos <- sapply(1:length(x$state.names), function(i) {
         paste(x$state.names, x$state.names[i])
     })
+
+    if (!is.null(x$cov)) stop("The covariance matrix was not computed")
+    
     pos <- matrix(pos)
     if (!all((tr.choice %in% pos)))
         stop("'tr.choice' not in the possible transitions")
