@@ -3,6 +3,12 @@
 
 etmCIF <- function(formula, data, etype, subset, na.action, failcode = 1) {
 
+    if (!requireNamespace("survival"))
+        stop("This function requires the 'survival' package")
+    
+    Surv <- survival::Surv
+    is.Surv <- survival::is.Surv
+    
     if (missing(data)) stop("A data frame in which to interpret the formula must be supplied")
     if (missing(etype)) stop("'etype' is missing, with no default")
 

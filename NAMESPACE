@@ -2,7 +2,9 @@ useDynLib(etm)
 
 importFrom(Rcpp, evalCpp)
 
-import(lattice, survival, parallel, data.table)
+import(parallel, data.table)
+importFrom("survival", "Surv", "survfit", "is.Surv")
+importFrom("lattice", "xyplot")
 
 importFrom("graphics", "axis", "box", "close.screen", "lines", "par",
            "plot", "screen", "split.screen", "segments")

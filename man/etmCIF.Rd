@@ -53,6 +53,8 @@ etmCIF(formula, data, etype, subset, na.action, failcode = 1)
   \code{\link{summary.etmCIF}}, \code{\link{plot.etmCIF}}
 }
 \examples{
+
+library(survival)
 data(abortion)
 
 cif.ab <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,

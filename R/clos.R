@@ -60,7 +60,7 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
 
     ## Take care of the cox model and do the transformations in the
     ## same loop
-    temp_surv <- survfit(cox_model)
+    temp_surv <- survival::survfit(cox_model)
     dat_surv <- data.frame(time = temp_surv$time,
                            n.risk = temp_surv$n.risk,
                            n.event = temp_surv$n.event,
