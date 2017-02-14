@@ -8,7 +8,7 @@ importFrom("lattice", "xyplot")
 
 importFrom("graphics", "axis", "box", "close.screen", "lines", "par",
            "plot", "screen", "split.screen", "segments")
-importFrom("stats", "qnorm", "quantile", "model.extract", "terms")
+importFrom("stats", "qnorm", "quantile", "model.extract", "terms", "model.frame")
 
 export(etm,
        clos,
