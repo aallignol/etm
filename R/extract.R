@@ -55,7 +55,7 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         paste(x$state.names, x$state.names[i])
     })
 
-    if (!is.null(x$cov)) stop("The covariance matrix was not computed")
+    if (is.null(x$cov)) stop("The covariance matrix was not computed")
     
     pos <- matrix(pos)
     if (!all((tr.choice %in% pos)))
