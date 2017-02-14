@@ -54,11 +54,10 @@ etmCIF(formula, data, etype, subset, na.action, failcode = 1)
 }
 \examples{
 
-library(survival)
 data(abortion)
 
-cif.ab <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,
-               etype = cause, failcode = 3)
+cif.ab <- etmCIF(survival::Surv(entry, exit, cause != 0) ~ group, abortion,
+                 etype = cause, failcode = 3)
 
 cif.ab
 

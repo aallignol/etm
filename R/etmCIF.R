@@ -3,7 +3,7 @@
 
 etmCIF <- function(formula, data, etype, subset, na.action, failcode = 1) {
 
-    if (!requireNamespace("survival"))
+    if (!requireNamespace("survival", quietly = TRUE))
         stop("This function requires the 'survival' package")
     
     Surv <- survival::Surv
