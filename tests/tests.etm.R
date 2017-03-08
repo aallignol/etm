@@ -218,3 +218,37 @@ ref$from <- factor(as.character(ref$from), levels = c("0", "1", "2", "cens"))
 ref$to <- factor(as.character(ref$to), levels = c("0", "1", "2", "cens"))
 
 all.equal(ref, newdat)
+
+
+######################################
+### Test the stratified calls
+######################################
+
+if (!require(kmi, quietly = TRUE))
+    stop("The following tests require the 'kmi' package")
+
+library(etm, lib.loc="/data/R/dev_lib/")
+
+data(icu.pneu)
+my.icu.pneu <- icu.pneu
+
+my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
+masque <- diff(my.icu.pneu$id)
+
+my.icu.pneu$from <- 0
+my.icu.pneu$from[c(1, masque) == 0] <- 1
+
+my.icu.pneu$to2 <- my.icu.pneu$event
+my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
+my.icu.pneu$to2[c(masque, 1) == 0] <- 1
+
+
+my.icu.pneu$to <- ifelse(my.icu.pneu$to2 %in% c(2, 3), 2,
+                         my.icu.pneu$to2)
+
+my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
+                               "to2", "age", "sex")]
+names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
+
+bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
+                  

@@ -5,7 +5,7 @@ etm <- function(x, ...) {
 
 etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
                            covariance = TRUE, delta.na = TRUE, modif = FALSE,
-                           c = 1, alpha = NULL, strat_variable, ...) {
+                           c = 1, alpha = NULL, strata, ...) {
 
     if (missing(x))
         stop("Argument 'x' (the data) is missing with no default")
@@ -42,14 +42,14 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         }
     }
     ## The stratification variable
-    if (missing(strat_variable)) {
+    if (missing(strata)) {
         strat_var <- "X"
         x$X <- "1"
         is_stratified <- FALSE
     } else {
-        if (!all(strat_variable %in% names(x)))
+        if (!all(strata %in% names(x)))
             stop("Stratification variables not in data")
-        strat_var <- strat_variable
+        strat_var <- strata
         x[, (strat_var) := lapply(.SD, as.character), .SDcols = strat_var]
         is_stratified <- TRUE
     }
@@ -240,7 +240,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         res$tra <- tra
         res$state.names <- state.names
         res$data <- x
-        res$strata_variable <- strat_variable
+        res$strata_variable <- strata
         res$strata <- do.call('c', lapply(conditions, as.character))
         class(res) <- "etm"
     } else {
