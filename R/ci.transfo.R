@@ -37,9 +37,9 @@ avec.cov <- function(i, object, transfo, trs.sep, trs, level) {
     
 
 ci.transfo <- function(object, tr.choice, level = 0.95, transfo = "linear") {
-    if (!inherits(object, "etm")) {
-        stop ("'x' must be of class 'etm'")
-    }
+    ## if (!inherits(object, "etm")) {
+    ##     stop ("'x' must be of class 'etm'")
+    ## }
     lt <- length(tr.choice)
     trs <- tr.choice
     trs.sep <- lapply(trs, strsplit, split = " ")
