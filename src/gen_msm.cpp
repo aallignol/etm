@@ -105,6 +105,7 @@ RcppExport SEXP gen_msm(SEXP _times,
 		    }
 		}
 		else {
+		    if (exit[i] > times[t]) break;
 		    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
 		}
 	    }
