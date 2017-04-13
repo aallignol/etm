@@ -1,5 +1,29 @@
-        
-summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, ...) {
+find_times <- function(d, timepoints) {
+
+    ind <- findInterval(timepoints, d$time)
+    ind0 <- sum(ind == 0)
+    
+    dd <- d[ind, ]
+
+    if (ind0 > 0) {
+        tmp <- d[1, , drop = FALSE]
+        tmp$P <- round(tmp$P)
+        tmp$var <- 0
+        tmp$lower <- tmp$upper <- tmp$P
+        tmp$n.event <- 0
+
+        for (i in seq_len(ind0)) dd <- rbind(tmp, dd)
+    }
+
+    dd$time <- timepoints
+    dd$n.event <- cumsum(dd$n.event)
+
+    dd
+}
+     
+
+
+summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, times, ...) {
 
     if (!inherits(object, "etm"))
         stop("'object' must be of class 'etm'")
@@ -64,10 +88,14 @@ summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, ...)
         trs <- tr.choice
     }
 
+    not_missing <- !missing(times)
     if (ns > 1) {
-
+        
         res <- lapply(seq_len(ns), function(i) {
-            ci.transfo(object[[i]], trs, level, ci.fun)
+            tmp <- ci.transfo(object[[i]], trs, level, ci.fun)
+            if (not_missing) tmp <- lapply(tmp, find_times, timepoints = times)
+            class(tmp) <- "summary.etm"
+            tmp
         })
         names(res) <- object$strata
         class(res) <- "summary.etm"
@@ -75,6 +103,7 @@ summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, ...)
     } else {
         
         res <- ci.transfo(object, trs, level, ci.fun)
+        if (not_missing) res <- lapply(res, find_times, timepoints = times)
         class(res) <- "summary.etm"
     }
     
