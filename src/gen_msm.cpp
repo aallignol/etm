@@ -34,9 +34,6 @@ RcppExport SEXP gen_msm(SEXP _times,
     ivec Tfrom(__from.begin(), __from.size(), false);
     ivec Tto(__to.begin(), __to.size(), false);
     imat const_modif(__const_modif.begin(), __const_modif.nrow(), __const_modif.ncol(), false);
-
-    // vec entry(Tentry), exit(Texit);
-    // ivec to(Tto), from_entry(Tfrom), from_exit(Tfrom);
     
     // do some sorting
     std::sort(times.begin(), times.end());
@@ -51,19 +48,26 @@ RcppExport SEXP gen_msm(SEXP _times,
     const int lt = times.size();
     const int n = entry.size();
     const int nstate = Rcpp::as<int>(_nstate);
-    // const int const_modif = Rcpp::as<int>(_const_modif);
-
-    //const int cova = Rcpp::as<int>(_covariance);
     
     // define the matrices we need
-    mat nrisk(lt, nstate); nrisk.zeros();
+    mat nrisk(lt, nstate, fill::zeros);
+    
     cube nev(nstate, nstate, lt); nev.zeros();
     cube dna(nstate, nstate, lt); dna.zeros();
 
-    // if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
-    // if (n > 1) {
-    // 	nrisk(1, from_exit[0] - 1) -= 1;
-    // }
+
+    // the entries
+    int l = 0;
+    for (int j = 0; j < n; ++j) {
+    	if (entry[j] < times[l]) {
+    	    nrisk(l, from_entry[j] - 1) += 1;
+    	} else {
+	    while (l < lt && entry[j] >= times[l]) {
+		++l;
+	    }
+	    nrisk(l, from_entry[j] - 1) += 1;
+	}
+    }
 
     // the events
     int t = 0;
@@ -111,23 +115,6 @@ RcppExport SEXP gen_msm(SEXP _times,
 	    }
 	}
     }
-    
-    //Rcpp::Rcout << "break = " << 5 << std::endl;
-    
-    // the entries
-    int l = 0;
-    for (int j = 0; j < n; ++j) {
-    	if (entry[j] < times[l]) {
-    	    nrisk(l, from_entry[j] - 1) += 1;
-    	}
-    	else {
-	    do {
-		++l;
-	    } while (l < lt && entry[j] >= times[l]);
-	    if (l < lt) nrisk(l, from_entry[j] - 1) += 1;
-	}
-    }
-    // Rcpp::Rcout << "break = " << 6 << std::endl;
     mat y = cumsum(nrisk);
 
     ivec cc = const_modif.row(0);
@@ -144,7 +131,6 @@ RcppExport SEXP gen_msm(SEXP _times,
     
     cube est = prodint(dna, nstate, lt);	
     // ProfilerStop();
-    // Rcpp::Rcout << "break = " << 7 << std::endl;
     
     return Rcpp::List::create(Rcpp::Named("n.risk") = y,
 			      Rcpp::Named("n.event") = nev,
