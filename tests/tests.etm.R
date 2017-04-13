@@ -80,7 +80,7 @@ prob.sir <- etm(sir.cont, c("0", "1", "2"), tra, "cens", 1)
 prob.sir
 
 summ.sir <- summary(prob.sir)
-all.equal(summ.sir[[1]]$P, as.vector(trprob(prob.sir, "0 1")))
+all.equal(summ.sir[['0 1']]$P, as.vector(trprob(prob.sir, "0 1")))
 summ.sir[[2]]
 
 ## gonna play a bit with the state names
@@ -227,7 +227,7 @@ all.equal(ref, newdat)
 if (!require(kmi, quietly = TRUE))
     stop("The following tests require the 'kmi' package")
 
-library(etm, lib.loc="/data/R/dev_lib/")
+library(etm, lib.loc= "/data/R/dev_lib/")
 
 data(icu.pneu)
 my.icu.pneu <- icu.pneu
@@ -252,3 +252,8 @@ names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
 
 bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
                   
+## TODO some tests on correctness of compution
+
+the_summary <- summary(bouh_strat)
+
+## TODO some tests on correctness
