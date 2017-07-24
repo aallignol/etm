@@ -1,4 +1,4 @@
-#define ARMA_NO_DEBUG
+// #define ARMA_NO_DEBUG
 
 // pbl in the new stuff for "1" event: Probably
 // does something weird when last data point with ties
@@ -39,8 +39,10 @@ RcppExport SEXP gen_msm(SEXP _times,
     std::sort(times.begin(), times.end());
     uvec ind_entry = sort_index(Tentry);
     uvec ind_exit = sort_index(Texit);
+    
     vec entry = Tentry.elem(ind_entry);
     ivec from_entry = Tfrom.elem(ind_entry);
+    
     vec exit = Texit.elem(ind_exit);
     ivec to = Tto.elem(ind_exit);
     ivec from_exit = Tfrom.elem(ind_exit);
@@ -117,7 +119,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     }
     mat y = cumsum(nrisk);
 
-    ivec cc = const_modif.row(0);
+    irowvec cc = const_modif.row(0);
     if (any(cc)) {
 	umat tmp = (y >= const_modif);
 	mat  which_compute = conv_to<mat>::from(tmp);
