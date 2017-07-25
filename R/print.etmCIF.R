@@ -1,6 +1,6 @@
 ### Print Method for cif.etm objects
 print.etmCIF <- function(x, ...) {
-    
+
     if (!inherits(x, "etmCIF")) {
         stop("'x' must be of class 'etmCIF'")
     }
@@ -11,12 +11,12 @@ print.etmCIF <- function(x, ...) {
         cat("Covariate: ", rownames(x$X), "\n")
         cat("\tlevels: ", x$X, "\n\n")
     }
-        
+
     l.trans <- nrow(x[[1]]$trans)
     l.x <- length(x$X)
 
     zzz <- lapply(seq_len(l.x), function(i) {
-        temp <- summary(x[[i]])
+        temp <- summary(x[[i]])[-1]
         mat <- matrix(0, ncol = 4, nrow = l.trans)
         for (j in seq_len(l.trans)) {
             n.temp <- nrow(temp[[j]])
@@ -34,6 +34,6 @@ print.etmCIF <- function(x, ...) {
         }
         print(mat)
     })
-    
+
     invisible()
 }
