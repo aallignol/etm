@@ -64,7 +64,7 @@ RcppExport SEXP gen_msm(SEXP _times,
     	if (entry[j] < times[l]) {
     	    nrisk(l, from_entry[j] - 1) += 1;
     	} else {
-	    while (l < lt && entry[j] >= times[l]) {
+	    while (l < lt && entry[j] >= times[l] && entry[j] <= max(times)) {
 		++l;
 	    }
 	    nrisk(l, from_entry[j] - 1) += 1;
