@@ -77,7 +77,7 @@ closPseudo(data, state.names, tra, cens.name, s = 0,
 }
 
 \author{
-  Arthur Allignol \email{arthur.allignol@uni-ulm.de}
+  Arthur Allignol \email{arthur.allignol@gmail.com}
 }
 
 \seealso{

@@ -46,7 +46,7 @@
 \value{
   No value returned
 }
-\author{Arthur Allignol, \email{arthur.allignol@uni-ulm.de}}
+\author{Arthur Allignol, \email{arthur.allignol@gmail.com}}
 \seealso{\code{\link{plot.default}}, \code{\link{legend}}, \code{\link{etm}} }
 \examples{
 data(sir.cont)

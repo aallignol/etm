@@ -40,7 +40,7 @@ tra_surv(state.names = c("0", "1"))
 }
 
 \author{
-  Arthur Allignol \email{arthur.allignol@uni-ulm.de}
+  Arthur Allignol \email{arthur.allignol@gmail.com}
 }
 
 \seealso{

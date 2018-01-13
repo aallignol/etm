@@ -138,7 +138,7 @@
   Glidden, D. (2002). Robust inference for event probabilities with
   non-Markov data. \emph{Biometrics}, 58: 361-368.
 }
-\author{Arthur Allignol, \email{arthur.allignol@uni-ulm.de}}
+\author{Arthur Allignol, \email{arthur.allignol@gmail.com}}
 
 \note{Transitions into a same state, mathematically superfluous, are not
   allowed. If transitions into the same state are detected in the data,

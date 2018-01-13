@@ -101,7 +101,7 @@ clos(x, aw, ratio, ...)
   Aalen-Johansen estimator. \emph{R News} 6(2), 31--35.
 }
   
-\author{Arthur Allignol \email{arthur.allignol@uni-ulm.de},
+\author{Arthur Allignol \email{arthur.allignol@gmail.com},
   Matthias Wangler, Jan Beyersmann}
 \seealso{\code{\link{etm}}}
 \examples{

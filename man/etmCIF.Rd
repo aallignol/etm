@@ -46,7 +46,7 @@ etmCIF(formula, data, etype, subset, na.action, failcode = 1)
     the levels of this covariate.}
 }
 \author{
-  Arthur Allignol \email{arthur.alignol@uni-ulm.de}
+  Arthur Allignol \email{arthur.alignol@gmail.com}
 }
 \seealso{
   \code{\link{etm}}, \code{\link{print.etmCIF}},
