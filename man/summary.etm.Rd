@@ -6,14 +6,15 @@
   Summary method for objects of class \code{etm}
 }
 \usage{
-\S3method{summary}{etm}(object, all = FALSE,
-        ci.fun = "linear", level = 0.95, ...)
+\S3method{summary}{etm}(object, tr.choice,
+        ci.fun = "linear", level = 0.95, times, ...)
 \S3method{print}{summary.etm}(x, ...)
 }
 \arguments{
   \item{object}{An object of class \code{etm}.}
-  \item{all}{If set to TRUE, a data.frame will be computed for all
-    transitions that are not 0 in the empirical transition matrix.}
+  \item{tr.choice}{Character vector of the form 'c("from to","from
+    to")' specifying which transitions should be summarized. Default to all
+    the transition probabilities}
   \item{ci.fun}{A character vector specifying the transformation to be
     applied to the pointwise confidence intervals. It could be different
     for each transition probability, though if \code{length(ci.fun) !=
@@ -27,6 +28,8 @@
   \item{level}{Level of the two-sided confidence intervals. Default is
     0.95.}
   \item{x}{A \code{summary.cpf} object}
+  \item{times}{Time points for which estimates should be
+    returned. Default to all transition times.}
   \item{\dots}{Further arguments}
 }
 \value{

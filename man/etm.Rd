@@ -11,7 +11,7 @@
 \usage{
 \S3method{etm}{data.frame}(x, state.names, tra, cens.name, s, t = "last",
     covariance = TRUE, delta.na = TRUE, modif = FALSE,
-    c = 1, alpha = NULL, strat_variable, ...)
+    c = 1, alpha = NULL, strata, ...)
 }
 \arguments{
   \item{x}{data.frame of the form data.frame(id,from,to,time)
@@ -106,6 +106,9 @@
     Nelson-Aalen estimator.}
   \item{ind.n.risk}{When \code{modif} is true, risk set size for which
     the indicator function is 1}
+
+  If the analysis is stratified, a list of \code{etm} objects is
+  returned.
 }
 \references{
   Beyersmann J, Allignol A, Schumacher M: Competing Risks and Multistate

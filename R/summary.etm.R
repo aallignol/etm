@@ -2,7 +2,7 @@ find_times <- function(d, timepoints) {
 
     ind <- findInterval(timepoints, d$time)
     ind0 <- sum(ind == 0)
-    
+
     dd <- d[ind, ]
 
     if (ind0 > 0) {
@@ -20,7 +20,7 @@ find_times <- function(d, timepoints) {
 
     dd
 }
-     
+
 
 
 summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, times, ...) {
@@ -31,7 +31,7 @@ summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, time
     if (level <= 0 | level > 1) {
         stop ("'level' must be between 0 and 1")
     }
-    
+
     ref <- c("linear", "log", "cloglog", "log-log")
     if (sum(ci.fun %in% ref == FALSE) != 0) {
         stop("'ci.fun' is not correct. See help page")
@@ -54,18 +54,18 @@ summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, time
     ## Derive the transition names we need
     if (missing(tr.choice)) {
         if (!is.null(object$strata_variable)) {
-            
+
             indi <- lapply(1:ns, function(i) {
                 !apply(object[[i]]$est != 0, c(1, 2), function(temp){all(temp == FALSE)})
             })
             indi <- do.call("+", indi) > 0
-            
+
         } else {
 
             ind <- object$est != 0
             indi <- !apply(ind, c(1, 2), function(temp){all(temp == FALSE)})
         }
-            
+
         tmp <- which(indi, arr.ind = TRUE)
         tmp <- tmp[order(tmp[, 1]), ]
         namen <- list(rownames(indi), colnames(indi))
@@ -78,19 +78,19 @@ summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, time
             trs <- trs[-grep(paste("^", absorb[i], sep =""), trs, perl = TRUE)]
 
     } else {
-        
-        ref <- sapply(1:length(x$state.names), function(i) {
-            paste(x$state.names, x$state.names[i])
+
+        ref <- sapply(1:length(object$state.names), function(i) {
+            paste(object$state.names, object$state.names[i])
         })
         ref <- matrix(ref)
-        if (sum(tr.choice %in% ref == FALSE) > 0) 
+        if (sum(tr.choice %in% ref == FALSE) > 0)
             stop("Argument 'tr.choice' and possible transitions must match")
         trs <- tr.choice
     }
 
     not_missing <- !missing(times)
     if (ns > 1) {
-        
+
         res <- lapply(seq_len(ns), function(i) {
             tmp <- ci.transfo(object[[i]], trs, level, ci.fun)
             if (not_missing) tmp <- lapply(tmp, find_times, timepoints = times)
@@ -99,15 +99,15 @@ summary.etm <- function(object, tr.choice, ci.fun = "linear", level = 0.95, time
         })
         names(res) <- object$strata
         class(res) <- "summary.etm"
-        
+
     } else {
-        
+
         res <- ci.transfo(object, trs, level, ci.fun)
         if (not_missing) res <- lapply(res, find_times, timepoints = times)
         class(res) <- "summary.etm"
     }
-    
+
     res
 }
 
-        
+
