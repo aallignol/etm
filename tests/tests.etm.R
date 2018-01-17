@@ -227,7 +227,7 @@ all.equal(ref, newdat)
 if (!require(kmi, quietly = TRUE))
     stop("The following tests require the 'kmi' package")
 
-library(etm, lib.loc= "/data/R/dev_lib/")
+library(etm)
 
 data(icu.pneu)
 my.icu.pneu <- icu.pneu
@@ -251,9 +251,12 @@ my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
 names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
 
 bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
-                  
-## TODO some tests on correctness of compution
+
+bouh_female <- etm(my.icu.pneu[my.icu.pneu$sex == "F", ],
+                   c("0", "1", "2"), tra_ill(), "cens", 0)
+
+all(bouh_strat[[1]]$est == bouh_female$est)
+
 
 the_summary <- summary(bouh_strat)
-
-## TODO some tests on correctness
+the_summary
