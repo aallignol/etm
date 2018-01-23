@@ -2,10 +2,12 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
                      col = 1, lty, xlim, ylim, conf.int = FALSE, level = 0.95,
                      ci.fun = "linear", ci.col = col, ci.lty = 3,
                      legend = TRUE, legend.pos, curvlab, legend.bty = "n", ...) {
-    
+
     if (!inherits(x, "etm"))
         stop("'x' must be a 'etm' object")
-    
+
+    is_stratified <- !is.null(x$strata)
+
     ufrom <- unique(x$trans$from)
     uto <- unique(x$trans$to)
     absorb <- setdiff(uto, ufrom)
@@ -14,7 +16,13 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
     pos <- c(paste(nam1[!(nam1 %in% as.character(absorb))],
                    nam2[!(nam2 %in% as.character(absorb))]),
              paste(x$trans$from, x$trans$to))
-    if (missing(tr.choice)) tr.choice <- pos
+    if (missing(tr.choice)) {
+        if (is_stratified) {
+            tr.choice <- pos[1]
+        } else {
+            tr.choice <- pos
+        }
+    }
 
     ref <- sapply(1:length(x$state.names), function(i) {
         paste(x$state.names, x$state.names[i])
@@ -23,7 +31,16 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
     if (sum(tr.choice %in% ref == FALSE) > 0)
         stop("Argument 'tr.choice' and possible transitions must match")
 
-    temp <- ci.transfo(x, tr.choice, level, ci.fun)
+    if (is_stratified) {
+        lstrat <- length(x$strata)
+
+        temp <- lapply(seq_len(lstrat), function(i) {
+            ci.transfo(x[i], tr.choice, level, ci.fun)
+        })
+    } else {
+
+        temp <- ci.transfo(x, tr.choice, level, ci.fun)
+    }
 
     lt <- length(temp)
 
@@ -84,6 +101,6 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
         do.call("legend", c(list(xx, yy, curvlab, col=col, lty=lty, bty = legend.bty),
                             args[!is.na(ii)]))
     }
-    
+
     invisible()
 }
