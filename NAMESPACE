@@ -30,6 +30,7 @@ S3method(print, clos.etm)
 S3method(plot, clos.etm)
 S3method(xyplot, etm)
 S3method(print, etm)
+S3method("[", etm)
 S3method(summary, etm)
 S3method(print, summary.etm)
 S3method(plot, etm)
@@ -44,4 +45,4 @@ S3method(print, summary.etmCIF)
 
 ## exportPattern("^[[:alpha:]]+")
 
- 
+

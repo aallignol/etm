@@ -7,21 +7,21 @@ trcov <- function(x, ...) {
 }
 
 trprob.etm <- function(x, tr.choice, timepoints, ...) {
-    
+
     if (!inherits(x, "etm"))
         stop("'x' must be a 'etm' object")
     if (!is.character(tr.choice))
         stop("'tr.choice' must be a character vector")
     if (length(tr.choice) != 1)
         stop("The function only extracts 1 transition probability")
-    
+
     pos <- sapply(1:length(x$state.names), function(i) {
         paste(x$state.names, x$state.names[i])
     })
     pos <- matrix(pos)
     if (!(tr.choice %in% pos))
         stop("'tr.choice' not in the possible transitions")
-    
+
     trans.sep <- strsplit(tr.choice, " ")
     if (length(trans.sep[[1]]) != 2) {
         tt <- charmatch(trans.sep[[1]], x$state.names, nomatch = 0)
@@ -29,21 +29,48 @@ trprob.etm <- function(x, tr.choice, timepoints, ...) {
     }
     trans.sep <- unlist(trans.sep)
 
-    if (missing(timepoints)) {
-        tmp <- x$est[trans.sep[1], trans.sep[2], ]
+    miss_timepoints <- missing(timepoints)
 
+    ## Number of strata. Will be computed in this if condition
+    if (!is.null(x$strata_variable)) {
+        ns <- length(x$strata)
     } else {
-        ind <- findInterval(timepoints, x$time)
-        tmp <- numeric(length(timepoints))
-        place <- which(ind != 0)
-        noplace <- which(ind == 0)
-        tmp[place] <- x$est[trans.sep[1], trans.sep[2], ind]
-        if (trans.sep[1] == trans.sep[2])
-            tmp[noplace] <- 1
+        if (miss_timepoints) {
+            tmp <- x$est[trans.sep[1], trans.sep[2], ]
+        } else {
+            ind <- findInterval(timepoints, x$time)
+            tmp <- numeric(length(timepoints))
+            place <- which(ind != 0)
+            noplace <- which(ind == 0)
+            tmp[place] <- x$est[trans.sep[1], trans.sep[2], ind]
+            if (trans.sep[1] == trans.sep[2])
+                tmp[noplace] <- 1
+        }
+        return(tmp)
     }
-    tmp
+
+    ## Compute for the case with strata
+    res <- lapply(1:ns, function(i) {
+        if (miss_timepoints) {
+            tmp <- x[[i]]$est[trans.sep[1], trans.sep[2], ]
+        } else {
+            ind <- findInterval(timepoints, x[[i]]$time)
+            tmp <- numeric(length(timepoints))
+            place <- which(ind != 0)
+            noplace <- which(ind == 0)
+            tmp[place] <- x[[i]]$est[trans.sep[1], trans.sep[2], ind]
+            if (trans.sep[1] == trans.sep[2])
+                tmp[noplace] <- 1
+        }
+        tmp
+    })
+
+    names(res) <- names(x)[seq_len(ns)]
+
+    res
+
 }
-    
+
 trcov.etm <- function(x, tr.choice, timepoints, ...) {
     if (!inherits(x, "etm"))
         stop("'x' must be a 'etm' object")
@@ -55,24 +82,49 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         paste(x$state.names, x$state.names[i])
     })
 
-    if (is.null(x$cov)) stop("The covariance matrix was not computed")
-    
     pos <- matrix(pos)
     if (!all((tr.choice %in% pos)))
         stop("'tr.choice' not in the possible transitions")
     if (length(tr.choice) == 1) {
         tr.choice <- rep(tr.choice, 2)
     }
-    if (missing(timepoints)) {
+
+    miss_timepoints <- missing(timepoints)
+
+    if (!is.null(x$strata_variable)) {
+        ns <- length(x$strata)
+        if (is.null(x[[1]]$cov)) stop("The covariance matrix was not computed")
+    } else {
+        if (is.null(x$cov)) stop("The covariance matrix was not computed")
+        if (miss_timepoints) {
         tmp <- x$cov[tr.choice[1], tr.choice[2], ]
+        }
+        else {
+            ind <- findInterval(timepoints, x$time)
+            tmp <- numeric(length(timepoints))
+            place <- which(ind != 0)
+            tmp[place] <- x$cov[tr.choice[1], tr.choice[2], ind]
+        }
+        return(tmp)
     }
-    else {
-        ind <- findInterval(timepoints, x$time)
-        tmp <- numeric(length(timepoints))
-        place <- which(ind != 0)
-        tmp[place] <- x$cov[tr.choice[1], tr.choice[2], ind]
-    }
-    tmp
+
+    res <- lapply(1:ns, function(i) {
+        if (miss_timepoints) {
+            tmp <- x[[i]]$cov[tr.choice[1], tr.choice[2], ]
+        }
+        else {
+            ind <- findInterval(timepoints, x[[i]]$time)
+            tmp <- numeric(length(timepoints))
+            place <- which(ind != 0)
+            tmp[place] <- x[[i]]$cov[tr.choice[1], tr.choice[2], ind]
+        }
+        tmp
+    })
+
+    names(res) <- names(x)[seq_len(ns)]
+
+    res
+
 }
 
 
@@ -128,49 +180,3 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
     res
 
 }
-
-## trprob.etm.stratified <- function(x, tr.choice, timepoints, ...) {
-    
-##     if (!inherits(x, "etm.stratified"))
-##         stop("'x' must be a 'etm.stratified' object")
-##     if (!is.character(tr.choice))
-##         stop("'tr.choice' must be a character vector")
-##     if (length(tr.choice) != 1)
-##         stop("The function only extracts 1 transition probability")
-    
-##     pos <- sapply(1:length(x$state.names), function(i) {
-##         paste(x$state.names, x$state.names[i])
-##     })
-##     pos <- matrix(pos)
-    
-##     if (!(tr.choice %in% pos))
-##         stop("'tr.choice' not in the possible transitions")
-    
-##     trans.sep <- strsplit(tr.choice, " ")
-    
-##     if (length(trans.sep[[1]]) != 2) {
-##         tt <- charmatch(trans.sep[[1]], x$state.names, nomatch = 0)
-##         trans.sep[[1]] <- x$state.names[tt]
-##     }
-##     trans.sep <- unlist(trans.sep)
-
-##     is_missing_time <- missing(timepoints)
-
-##     zzz <- lapply(seq_along(x$strata), function(i)
-##     {
-##         xx <- x[i]
-
-##         if (is_missing_time) {
-##             tmp <- xx$est[trans.sep[1], trans.sep[2], ]
-##         } else {
-##             ind <- findInterval(timepoints, xx$time)
-##             tmp <- numeric(length(timepoints))
-##             place <- which(ind != 0)
-##             tmp[place] <- xx$est[trans.sep[1], trans.sep[2], ind]
-##         }
-##         tmp
-##     })
-    
-##     names(zzz) <- x$strata
-##     zzz
-## }
