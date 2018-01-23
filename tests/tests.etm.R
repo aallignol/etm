@@ -257,6 +257,15 @@ bouh_female <- etm(my.icu.pneu[my.icu.pneu$sex == "F", ],
 
 all(bouh_strat[[1]]$est == bouh_female$est)
 
-
+## Test the summary
 the_summary <- summary(bouh_strat)
 the_summary
+
+## Test trprob
+all(trprob(bouh_strat, "0 1")[[1]] == trprob(bouh_female, "0 1"))
+all(trprob(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trprob(bouh_female, "0 1", c(0, 5, 10, 15)))
+
+## Test trcov
+all(trcov(bouh_strat, "0 1")[[1]] == trcov(bouh_female, "0 1"))
+all(trcov(bouh_strat, c("0 1", "0 2"))[[1]] == trcov(bouh_female, c("0 1", "0 2")))
+all(trcov(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trcov(bouh_female, "0 1", c(0, 5, 10, 15)))
