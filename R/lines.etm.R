@@ -5,7 +5,9 @@ lines.etm <- function(x, tr.choice, col = 1, lty,
     if (!inherits(x, "etm")) {
         stop("'x' must be of class 'etm'")
     }
-    
+
+    is_stratified <- !is.null(x$strata)
+
     ufrom <- unique(x$trans$from)
     uto <- unique(x$trans$to)
     absorb <- setdiff(uto, ufrom)
@@ -14,8 +16,15 @@ lines.etm <- function(x, tr.choice, col = 1, lty,
     pos <- c(paste(nam1[!(nam1 %in% as.character(absorb))],
                    nam2[!(nam2 %in% as.character(absorb))]),
              paste(x$trans$from, x$trans$to))
-    if (missing(tr.choice)) tr.choice <- pos
-    
+
+    if (missing(tr.choice)) {
+        if (is_stratified) {
+            tr.choice <- pos[1]
+        } else {
+            tr.choice <- pos
+        }
+    }
+
     ref <- sapply(1:length(x$state.names), function(i) {
         paste(x$state.names, x$state.names[i])
     })
@@ -23,8 +32,19 @@ lines.etm <- function(x, tr.choice, col = 1, lty,
     if (sum(tr.choice %in% ref == FALSE) > 0)
         stop("Argument 'tr.choice' and possible transitions must match")
 
-    temp <- ci.transfo(x, tr.choice, level, ci.fun)
-    
+    if (is_stratified) {
+
+        lstrat <- length(x$strata)
+        temp <- lapply(seq_len(lstrat), function(i) {
+            tmp <- ci.transfo(x[[i]], tr.choice, level, ci.fun)
+            tmp2 <- lapply(tmp, cbind, strata = x$strata[[i]])
+            tmp2
+        })
+        temp <- do.call(c, temp)
+    } else {
+        temp <- ci.transfo(x, tr.choice, level, ci.fun)
+    }
+
     lt <- length(temp)
 
     if (missing(lty)) {
@@ -53,6 +73,6 @@ lines.etm <- function(x, tr.choice, col = 1, lty,
                   col = ci.col[i], lty = ci.lty[i], ...)
         }
     }
-    
+
     invisible()
 }

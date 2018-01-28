@@ -32,13 +32,15 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
         stop("Argument 'tr.choice' and possible transitions must match")
 
     if (is_stratified) {
+
         lstrat <- length(x$strata)
-
         temp <- lapply(seq_len(lstrat), function(i) {
-            ci.transfo(x[i], tr.choice, level, ci.fun)
+            tmp <- ci.transfo(x[[i]], tr.choice, level, ci.fun)
+            tmp2 <- lapply(tmp, cbind, strata = x$strata[[i]])
+            tmp2
         })
+        temp <- do.call(c, temp)
     } else {
-
         temp <- ci.transfo(x, tr.choice, level, ci.fun)
     }
 
@@ -81,11 +83,17 @@ plot.etm <- function(x, tr.choice, xlab = "Time", ylab = "Transition Probability
         }
     }
 
+    ## Extend  to deal with the strata
     if (legend) {
         if (missing(legend.pos))
             legend.pos <- "topleft"
-        if (missing(curvlab))
-            curvlab <- tr.choice
+        if (missing(curvlab)) {
+            if (is_stratified) {
+                curvlab <- as.vector(sapply(tr.choice, paste, x$strata))
+            } else {
+                curvlab <- tr.choice
+            }
+        }
         if (is.list(legend.pos)) legend.pos <- unlist(legend.pos)
         if (length(legend.pos) == 1) {
             xx <- legend.pos
