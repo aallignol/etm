@@ -161,8 +161,8 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         res$tra <- x$tra
         res$state.names <- x$state.names
         res$data <- x$data
-        res$strat_variable <- x$strata_variable
-        res$strata <- x$strata[ind]
+        res$strat_variable <- NULL
+        res$strata <- NULL
 
     } else {
 
@@ -171,8 +171,8 @@ trcov.etm <- function(x, tr.choice, timepoints, ...) {
         res$tra <- x$tra
         res$state.names <- x$state.names
         res$data <- x$data
-        res$strat_variable <- x$strata_variable
-        res$strata <- x$strata[ind]
+        res$strat_variable <- NULL
+        res$strata <- NULL
 
     }
 
