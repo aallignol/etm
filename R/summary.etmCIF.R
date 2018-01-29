@@ -10,7 +10,7 @@ summary.etmCIF <- function(object, ci.fun = "cloglog", level = 0.95, ...) {
     l.trans <- nrow(object[[1]]$trans)
 
     temp <- lapply(object[seq_len(l.X)], function(ll) {
-        aa <- summary(ll, ci.fun = ci.fun, level = level, ...)[seq_len(l.trans)]
+        aa <- summary(ll, ci.fun = ci.fun, level = level, ...)[seq_len(l.trans) + 1]
         names(aa) <- paste("CIF ", sapply(strsplit(sub("\\s", "|", names(aa)[1:l.trans]), "\\|"),
                                               "[", 2), sep = "")
         aa
@@ -39,8 +39,8 @@ print.summary.etmCIF <- function(x, ...) {
             cat("\n")
         }
     }
-    
+
     invisible()
 }
 
-        
+
