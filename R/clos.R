@@ -15,8 +15,9 @@ clos.etm <- function(x, aw = FALSE, ratio = FALSE, ...) {
         stop("Needs the increment of the Nelson-Aalen estimator")
     }
 
+    if (!is.null(x$strata)) stop("'clos' is not yet implemented for etm objects with strata. Please use e.g., 'clos(etm_object_name[1]'")
+
     ## test if we have an illness-death model
-    
     dims <- dim(x$est)
     comp.risk <- FALSE
     if (dims[1] == 4) comp.risk <- TRUE
@@ -27,7 +28,7 @@ clos.etm <- function(x, aw = FALSE, ratio = FALSE, ...) {
         ## stop("not yet")
     }
     else res <- clos.nocp(x, aw, ratio)
-    
+
     class(res) <- "clos.etm"
     res
 }
@@ -53,8 +54,8 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
     ltimes <- unique(CumHaz[, length(time), by = trans][, V1])
 
     times <- sort(unique(CumHaz$time))
-    
-    
+
+
     dna <- nev <- array(0, dim = c(ltrans[1], ltrans[1], ltimes))
     nrisk <- matrix(0, nrow = ltimes, ncol = ltrans[1])
 
@@ -65,18 +66,18 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
                            n.risk = temp_surv$n.risk,
                            n.event = temp_surv$n.event,
                            trans = rep(trans, temp_surv$strata))
-    
+
     for (i in trans) {
         aa <- which(x$trans == i, arr.ind = TRUE)
         dna[aa[1], aa[2], ] <- CumHaz$dhaz[CumHaz$trans == i]
-        
+
         ## fill nev and nrisk
         dat_temp <- dat_surv[dat_surv$trans == i, ]
         ind <- findInterval(times, dat_temp$time)
         place <- which(ind != 0)
         tmp <- integer(ltimes)
         tmp <- cumsum(dat_temp$n.event)[ind]
-        
+
         nev[aa[1], aa[2], place] <- c(tmp[1], diff(tmp))
         nrisk[place, aa[1]] <- dat_temp$n.risk[ind]
 
@@ -100,7 +101,7 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
     if ((ind - 1) > dni) {
         nrisk[(dni + 1):(ind - 1), 2] <- cumsum(nev[1, 2, dni:(ind - 2)])
     }
-    
+
     ii <- seq_len(ltrans[1])
     for (i in seq_along(times)) {
         dna[cbind(ii, ii, i)] <- -(.rowSums(dna[, , i], ltrans[1], ltrans[1], FALSE))
@@ -117,7 +118,7 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
     ## tr.mat <- array(apply(dna, 3, "+", I), dim = c(ltrans, ltimes))
 
     d_tmp <- data.frame(exit = cox_model$y[, 2])
-    
+
     zzz <- list(est = est$est,
                 delta.na = dna,
                 time = est$time,
@@ -128,7 +129,7 @@ clos.msfit <- function(x, aw = FALSE, ratio = FALSE, cox_model, ...) {
 
 
     if (comp.risk) {
-        stop("not yet")
+        stop("'clos.msfit' is not yet implemented with competing risks")
     }
     else res <- clos.nocp(zzz, aw, ratio)
     class(res) <- "clos.etm"
