@@ -43,6 +43,9 @@
   \item{legend.bty}{Box type for the legend}
   \item{\dots}{Further arguments for plot}
 }
+\detail{
+  TODO
+}
 \value{
   No value returned
 }

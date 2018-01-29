@@ -1,15 +1,17 @@
 xyplot.etm <- function(x, data = NULL, tr.choice, col = c(1, 1, 1), lty = c(1, 3, 3),
                        xlab="Time", ylab = "Transition probability",
                        conf.int = TRUE, ci.fun = "linear", level = 0.95, ...) {
-    
+
     if (!inherits(x, "etm"))
         stop("Argument 'x' must be of class 'etm'")
-    
+
+    is_stratified <- !is.null(x$strata)
+
     ref <- sapply(1:length(x$state.names), function(i) {
         paste(x$state.names, x$state.names[i])
     })
     ref <- matrix(ref)
-    
+
     if (missing(tr.choice)) {
         ufrom <- unique(x$trans$from)
         uto <- unique(x$trans$to)
@@ -21,26 +23,48 @@ xyplot.etm <- function(x, data = NULL, tr.choice, col = c(1, 1, 1), lty = c(1, 3
                  paste(x$trans$from, x$trans$to))
         tr.choice <- pos
     }
-    
+
     if (sum(tr.choice %in% ref == FALSE) > 0)
         stop("Argument 'tr.choice' and possible transitions must match")
-    
-    temp <- ci.transfo(x, tr.choice, level, ci.fun)
-    
+
+    if (is_stratified) {
+
+        lstrat <- length(x$strata)
+        temp <- lapply(seq_len(lstrat), function(i) {
+            tmp <- ci.transfo(x[[i]], tr.choice, level, ci.fun)
+            tmp2 <- lapply(tmp, cbind, strata = x$strata[[i]])
+            tmp2
+        })
+        temp <- do.call(c, temp)
+    } else {
+        temp <- ci.transfo(x, tr.choice, level, ci.fun)
+    }
+
     for (i in seq_along(temp)) {
         temp[[i]]$cov <- names(temp)[i]
     }
     temp <- do.call(rbind, temp)
     temp$cov <- factor(temp$cov, levels = tr.choice)
-    
-    if (conf.int) {
-        aa <- lattice::xyplot(temp$P + temp$lower + temp$upper ~ temp$time | temp$cov,
-                              type = "s", col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+
+    if (is_stratified) {
+        if (conf.int) {
+            aa <- lattice::xyplot(temp$P + temp$lower + temp$upper ~ temp$time | temp$cov + temp$strata,
+                                  type = "s", col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+        }
+        else {
+            aa <- lattice::xyplot(temp$P ~ temp$time | temp$cov + temp$strata, type = "s",
+                                  col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+        }
+    } else {
+        if (conf.int) {
+            aa <- lattice::xyplot(temp$P + temp$lower + temp$upper ~ temp$time | temp$cov,
+                                  type = "s", col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+        }
+        else {
+            aa <- lattice::xyplot(temp$P ~ temp$time | temp$cov, type = "s",
+                                  col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
+        }
     }
-    else {
-        aa <- lattice::xyplot(temp$P ~ temp$time | temp$cov, type = "s",
-                              col = col, lty = lty, xlab = xlab, ylab = ylab, ...)
-    }
-    
+
     aa
 }
