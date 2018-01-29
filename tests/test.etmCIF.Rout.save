@@ -1,0 +1,516 @@
+
+R version 2.14.1 (2011-12-22)
+Copyright (C) 2011 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ### test file for etmCIF.
+> ### Really simple tests and comparison with etm
+> 
+> require(etm)
+Loading required package: etm
+Loading required package: lattice
+Loading required package: survival
+Loading required package: splines
+> 
+> data(abortion)
+> 
+> from <- rep(0, nrow(abortion))
+> to <- abortion$cause
+> entry <- abortion$entry
+> exit <- abortion$exit
+> id <- 1:nrow(abortion)
+> data <- data.frame(id, from, to, entry, exit, group = abortion$group)
+> 
+> ## Computation of the CIFs with etm
+> tra <- matrix(FALSE, 4, 4)
+> tra[1, 2:4] <- TRUE
+> 
+> cif.control <- etm(data[data$group == 0, ], c("0", "1", "2", "3"), 
++                         tra, NULL, 0)
+> cif.exposed <- etm(data[data$group == 1, ], c("0", "1", "2", "3"), 
++                         tra, NULL, 0)
+> 
+> 
+> ## Computation of the CIFs with etmCIF
+> 
+> netm <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,
++                etype = cause, failcode = 3)
+> 
+> ### let's do some comparisons :-)
+> 
+> all.equal(trprob(cif.control, "0 3"), netm[[1]]$est["0", "3", ])
+[1] TRUE
+> all.equal(trprob(cif.control, "0 2"), netm[[1]]$est["0", "2", ])
+[1] TRUE
+> all.equal(trprob(cif.control, "0 1"), netm[[1]]$est["0", "1", ])
+[1] TRUE
+> 
+> all.equal(trprob(cif.exposed, "0 3"), netm[[2]]$est["0", "3", ])
+[1] TRUE
+> all.equal(trprob(cif.exposed, "0 2"), netm[[2]]$est["0", "2", ])
+[1] TRUE
+> all.equal(trprob(cif.exposed, "0 1"), netm[[2]]$est["0", "1", ])
+[1] TRUE
+> 
+> 
+> all.equal(trcov(cif.control, "0 3"), netm[[1]]$cov["0 3", "0 3", ])
+[1] TRUE
+> all.equal(trcov(cif.control, "0 2"), netm[[1]]$cov["0 2", "0 2", ])
+[1] TRUE
+> all.equal(trcov(cif.control, "0 1"), netm[[1]]$cov["0 1", "0 1", ])
+[1] TRUE
+> 
+> all.equal(trcov(cif.exposed, "0 3"), netm[[2]]$cov["0 3", "0 3", ])
+[1] TRUE
+> all.equal(trcov(cif.exposed, "0 2"), netm[[2]]$cov["0 2", "0 2", ])
+[1] TRUE
+> all.equal(trcov(cif.exposed, "0 1"), netm[[2]]$cov["0 1", "0 1", ])
+[1] TRUE
+> 
+> 
+> netm
+Call: etmCIF(formula = Surv(entry, exit, cause != 0) ~ group, data = abortion, 
+    etype = cause, failcode = 3)
+
+Covariate:  group 
+	levels:  0 1 
+
+
+ group = 0 
+      time          P       se(P) n.event
+CIF 1   43 0.04015931 0.009257784      20
+CIF 2   43 0.79905931 0.022186468     924
+CIF 3   43 0.16078139 0.021326113      69
+
+ group = 1 
+      time         P      se(P) n.event
+CIF 1   42 0.2851118 0.04249308      38
+CIF 2   42 0.3525651 0.04213898      92
+CIF 3   42 0.3623231 0.04947340      43
+> 
+> ## test on the summary
+> snetm <- summary(netm)
+> 
+> snetm
+
+	 group=0 
+
+CIF 1 
+          P time          var      lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.00000000 0.00000000     18       0
+ 0.03895488   13 8.444048e-05 0.02448808 0.06169378    645       1
+ 0.04015931   23 8.570657e-05 0.02551262 0.06293875    819       0
+ 0.04015931   33 8.570657e-05 0.02551262 0.06293875    885       0
+ 0.04015931   39 8.570657e-05 0.02551262 0.06293875    716       0
+ 0.04015931   43 8.570657e-05 0.02551262 0.06293875      6       0
+
+CIF 2 
+          P time          var       lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.000000000 0.00000000     18       0
+ 0.00000000   13 0.000000e+00 0.000000000 0.00000000    645       0
+ 0.00000000   23 0.000000e+00 0.000000000 0.00000000    819       0
+ 0.01354288   33 1.216141e-05 0.008169604 0.02241009    885       6
+ 0.32201590   39 2.469805e-04 0.292313907 0.35391574    716     165
+ 0.79905931   43 4.922394e-04 0.753968839 0.84061317      6       6
+
+CIF 3 
+         P time          var     lower     upper n.risk n.event
+ 0.0000000    4 0.0000000000 0.0000000 0.0000000     18       0
+ 0.1504675   13 0.0004551293 0.1135970 0.1979013    645       1
+ 0.1570366   23 0.0004553237 0.1199469 0.2041947    819       0
+ 0.1599039   33 0.0004549788 0.1227389 0.2069247    885       0
+ 0.1607814   39 0.0004548031 0.1235965 0.2077571    716       0
+ 0.1607814   43 0.0004548031 0.1235965 0.2077571      6       0
+
+
+	 group=1 
+
+CIF 1 
+         P time         var     lower     upper n.risk n.event
+ 0.0000000    4 0.000000000 0.0000000 0.0000000      8       0
+ 0.2604775   12 0.001785362 0.1879526 0.3542503     94       5
+ 0.2811533   21 0.001802770 0.2074197 0.3742279     93       1
+ 0.2851118   32 0.001805662 0.2111650 0.3780568     90       0
+ 0.2851118   38 0.001805662 0.2111650 0.3780568     71       0
+ 0.2851118   42 0.001805662 0.2111650 0.3780568      6       0
+
+CIF 2 
+          P time          var       lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.000000000 0.00000000      8       0
+ 0.00000000   12 0.000000e+00 0.000000000 0.00000000     94       0
+ 0.00000000   21 0.000000e+00 0.000000000 0.00000000     93       0
+ 0.01541036   32 6.016217e-05 0.005730041 0.04110307     90       1
+ 0.13034947   38 5.576254e-04 0.090999609 0.18489993     71      12
+ 0.35256510   42 1.775693e-03 0.276882073 0.44177471      6       6
+
+CIF 3 
+         P time         var     lower     upper n.risk n.event
+ 0.0000000    4 0.000000000 0.0000000 0.0000000      8       0
+ 0.3143493   12 0.002571501 0.2266494 0.4254211     94       1
+ 0.3507019   21 0.002482739 0.2627692 0.4576195     93       0
+ 0.3584918   32 0.002459261 0.2706266 0.4644770     90       0
+ 0.3584918   38 0.002459261 0.2706266 0.4644770     71       0
+ 0.3623231   42 0.002447617 0.2744987 0.4678544      6       0
+
+> 
+> all.equal(unname(trprob(cif.control, "0 3")), snetm[[1]][[3]]$P)
+[1] TRUE
+> all.equal(unname(trprob(cif.control, "0 2")), snetm[[1]][[2]]$P)
+[1] TRUE
+> all.equal(unname(trprob(cif.control, "0 1")), snetm[[1]][[1]]$P)
+[1] TRUE
+> 
+> all.equal(unname(trprob(cif.exposed, "0 3")), snetm[[2]][[3]]$P)
+[1] TRUE
+> all.equal(unname(trprob(cif.exposed, "0 2")), snetm[[2]][[2]]$P)
+[1] TRUE
+> all.equal(unname(trprob(cif.exposed, "0 1")), snetm[[2]][[1]]$P)
+[1] TRUE
+> 
+> scif.control <- summary(cif.control, ci.fun = "cloglog")
+> scif.exposed <- summary(cif.exposed, ci.fun = "cloglog")
+> 
+> all.equal(scif.control[[3]]$lower, snetm[[1]][[3]]$lower)
+[1] TRUE
+> all.equal(scif.control[[3]]$upper, snetm[[1]][[3]]$upper)
+[1] TRUE
+> 
+> all.equal(scif.exposed[[3]]$lower, snetm[[2]][[3]]$lower)
+[1] TRUE
+> all.equal(scif.exposed[[3]]$upper, snetm[[2]][[3]]$upper)
+[1] TRUE
+> 
+> 
+> ### test with factors in the input
+> abortion$status <- with(abortion, ifelse(cause == 2, "life birth",
++                                          ifelse(cause == 1, "ETOP", "spontaneous abortion")))
+> 
+> abortion$status <- factor(abortion$status)
+> 
+> netm.factor <- etmCIF(Surv(entry, exit, status != "cens") ~ group, abortion,
++                       etype = status, failcode = "spontaneous abortion")
+> 
+> 
+> all.equal(trprob(cif.control, "0 3"), netm.factor[[1]]$est["0", "spontaneous abortion", ])
+[1] TRUE
+> all.equal(trprob(cif.control, "0 2"), netm.factor[[1]]$est["0", "life birth", ])
+[1] TRUE
+> 
+> netm.factor
+Call: etmCIF(formula = Surv(entry, exit, status != "cens") ~ group, 
+    data = abortion, etype = status, failcode = "spontaneous abortion")
+
+Covariate:  group 
+	levels:  0 1 
+
+
+ group = 0 
+                         time          P       se(P) n.event
+CIF ETOP                   43 0.04015931 0.009257784      20
+CIF life birth             43 0.79905931 0.022186468     924
+CIF spontaneous abortion   43 0.16078139 0.021326113      69
+
+ group = 1 
+                         time         P      se(P) n.event
+CIF ETOP                   42 0.2851118 0.04249308      38
+CIF life birth             42 0.3525651 0.04213898      92
+CIF spontaneous abortion   42 0.3623231 0.04947340      43
+> 
+> summary(netm.factor)
+
+	 group=0 
+
+CIF ETOP 
+          P time          var      lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.00000000 0.00000000     18       0
+ 0.03895488   13 8.444048e-05 0.02448808 0.06169378    645       1
+ 0.04015931   23 8.570657e-05 0.02551262 0.06293875    819       0
+ 0.04015931   33 8.570657e-05 0.02551262 0.06293875    885       0
+ 0.04015931   39 8.570657e-05 0.02551262 0.06293875    716       0
+ 0.04015931   43 8.570657e-05 0.02551262 0.06293875      6       0
+
+CIF life birth 
+          P time          var       lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.000000000 0.00000000     18       0
+ 0.00000000   13 0.000000e+00 0.000000000 0.00000000    645       0
+ 0.00000000   23 0.000000e+00 0.000000000 0.00000000    819       0
+ 0.01354288   33 1.216141e-05 0.008169604 0.02241009    885       6
+ 0.32201590   39 2.469805e-04 0.292313907 0.35391574    716     165
+ 0.79905931   43 4.922394e-04 0.753968839 0.84061317      6       6
+
+CIF spontaneous abortion 
+         P time          var     lower     upper n.risk n.event
+ 0.0000000    4 0.0000000000 0.0000000 0.0000000     18       0
+ 0.1504675   13 0.0004551293 0.1135970 0.1979013    645       1
+ 0.1570366   23 0.0004553237 0.1199469 0.2041947    819       0
+ 0.1599039   33 0.0004549788 0.1227389 0.2069247    885       0
+ 0.1607814   39 0.0004548031 0.1235965 0.2077571    716       0
+ 0.1607814   43 0.0004548031 0.1235965 0.2077571      6       0
+
+
+	 group=1 
+
+CIF ETOP 
+         P time         var     lower     upper n.risk n.event
+ 0.0000000    4 0.000000000 0.0000000 0.0000000      8       0
+ 0.2604775   12 0.001785362 0.1879526 0.3542503     94       5
+ 0.2811533   21 0.001802770 0.2074197 0.3742279     93       1
+ 0.2851118   32 0.001805662 0.2111650 0.3780568     90       0
+ 0.2851118   38 0.001805662 0.2111650 0.3780568     71       0
+ 0.2851118   42 0.001805662 0.2111650 0.3780568      6       0
+
+CIF life birth 
+          P time          var       lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.000000000 0.00000000      8       0
+ 0.00000000   12 0.000000e+00 0.000000000 0.00000000     94       0
+ 0.00000000   21 0.000000e+00 0.000000000 0.00000000     93       0
+ 0.01541036   32 6.016217e-05 0.005730041 0.04110307     90       1
+ 0.13034947   38 5.576254e-04 0.090999609 0.18489993     71      12
+ 0.35256510   42 1.775693e-03 0.276882073 0.44177471      6       6
+
+CIF spontaneous abortion 
+         P time         var     lower     upper n.risk n.event
+ 0.0000000    4 0.000000000 0.0000000 0.0000000      8       0
+ 0.3143493   12 0.002571501 0.2266494 0.4254211     94       1
+ 0.3507019   21 0.002482739 0.2627692 0.4576195     93       0
+ 0.3584918   32 0.002459261 0.2706266 0.4644770     90       0
+ 0.3584918   38 0.002459261 0.2706266 0.4644770     71       0
+ 0.3623231   42 0.002447617 0.2744987 0.4678544      6       0
+
+> 
+> ### test with group as a character vector
+> abortion$ttt <- with(abortion, ifelse(group == 0, "control", "exposed"))
+> abortion$ttt <- factor(abortion$ttt)
+> 
+> netm.ttt <- etmCIF(Surv(entry, exit, status != "cens") ~ ttt, abortion,
++                    etype = status, failcode = "spontaneous abortion")
+> 
+> all.equal(trprob(cif.control, "0 3"), netm.ttt[[1]]$est["0", "spontaneous abortion", ])
+[1] TRUE
+> all.equal(trprob(cif.control, "0 2"), netm.ttt[[1]]$est["0", "life birth", ])
+[1] TRUE
+> 
+> netm.ttt
+Call: etmCIF(formula = Surv(entry, exit, status != "cens") ~ ttt, data = abortion, 
+    etype = status, failcode = "spontaneous abortion")
+
+Covariate:  ttt 
+	levels:  control exposed 
+
+
+ ttt = control 
+                         time          P       se(P) n.event
+CIF ETOP                   43 0.04015931 0.009257784      20
+CIF life birth             43 0.79905931 0.022186468     924
+CIF spontaneous abortion   43 0.16078139 0.021326113      69
+
+ ttt = exposed 
+                         time         P      se(P) n.event
+CIF ETOP                   42 0.2851118 0.04249308      38
+CIF life birth             42 0.3525651 0.04213898      92
+CIF spontaneous abortion   42 0.3623231 0.04947340      43
+> 
+> summary(netm.ttt)
+
+	 ttt=control 
+
+CIF ETOP 
+          P time          var      lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.00000000 0.00000000     18       0
+ 0.03895488   13 8.444048e-05 0.02448808 0.06169378    645       1
+ 0.04015931   23 8.570657e-05 0.02551262 0.06293875    819       0
+ 0.04015931   33 8.570657e-05 0.02551262 0.06293875    885       0
+ 0.04015931   39 8.570657e-05 0.02551262 0.06293875    716       0
+ 0.04015931   43 8.570657e-05 0.02551262 0.06293875      6       0
+
+CIF life birth 
+          P time          var       lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.000000000 0.00000000     18       0
+ 0.00000000   13 0.000000e+00 0.000000000 0.00000000    645       0
+ 0.00000000   23 0.000000e+00 0.000000000 0.00000000    819       0
+ 0.01354288   33 1.216141e-05 0.008169604 0.02241009    885       6
+ 0.32201590   39 2.469805e-04 0.292313907 0.35391574    716     165
+ 0.79905931   43 4.922394e-04 0.753968839 0.84061317      6       6
+
+CIF spontaneous abortion 
+         P time          var     lower     upper n.risk n.event
+ 0.0000000    4 0.0000000000 0.0000000 0.0000000     18       0
+ 0.1504675   13 0.0004551293 0.1135970 0.1979013    645       1
+ 0.1570366   23 0.0004553237 0.1199469 0.2041947    819       0
+ 0.1599039   33 0.0004549788 0.1227389 0.2069247    885       0
+ 0.1607814   39 0.0004548031 0.1235965 0.2077571    716       0
+ 0.1607814   43 0.0004548031 0.1235965 0.2077571      6       0
+
+
+	 ttt=exposed 
+
+CIF ETOP 
+         P time         var     lower     upper n.risk n.event
+ 0.0000000    4 0.000000000 0.0000000 0.0000000      8       0
+ 0.2604775   12 0.001785362 0.1879526 0.3542503     94       5
+ 0.2811533   21 0.001802770 0.2074197 0.3742279     93       1
+ 0.2851118   32 0.001805662 0.2111650 0.3780568     90       0
+ 0.2851118   38 0.001805662 0.2111650 0.3780568     71       0
+ 0.2851118   42 0.001805662 0.2111650 0.3780568      6       0
+
+CIF life birth 
+          P time          var       lower      upper n.risk n.event
+ 0.00000000    4 0.000000e+00 0.000000000 0.00000000      8       0
+ 0.00000000   12 0.000000e+00 0.000000000 0.00000000     94       0
+ 0.00000000   21 0.000000e+00 0.000000000 0.00000000     93       0
+ 0.01541036   32 6.016217e-05 0.005730041 0.04110307     90       1
+ 0.13034947   38 5.576254e-04 0.090999609 0.18489993     71      12
+ 0.35256510   42 1.775693e-03 0.276882073 0.44177471      6       6
+
+CIF spontaneous abortion 
+         P time         var     lower     upper n.risk n.event
+ 0.0000000    4 0.000000000 0.0000000 0.0000000      8       0
+ 0.3143493   12 0.002571501 0.2266494 0.4254211     94       1
+ 0.3507019   21 0.002482739 0.2627692 0.4576195     93       0
+ 0.3584918   32 0.002459261 0.2706266 0.4644770     90       0
+ 0.3584918   38 0.002459261 0.2706266 0.4644770     71       0
+ 0.3623231   42 0.002447617 0.2744987 0.4678544      6       0
+
+> 
+> 
+> ### A couple of comparisons with simulated data
+> set.seed(1313)
+> time <- rexp(100)
+> to <- rbinom(100, 2, prob = c(1/3, 1/3, 1/3))
+> from <- rep(11, 100)
+> id <- 1:100
+> cov <- rbinom(100, 1, 0.5)
+> 
+> dat.s <- data.frame(id, time, from, to, cov)
+> 
+> traa <- matrix(FALSE, 3, 3)
+> traa[1, 2:3] <- TRUE
+> 
+> aa0 <- etm(dat.s[dat.s$cov == 0, ], c("11", "1", "2"), traa, "0", 0)
+> aa1 <- etm(dat.s[dat.s$cov == 1, ], c("11", "1", "2"), traa, "0", 0)
+> aa <- etm(dat.s, c("11", "1", "2"), traa, "0", 0)
+> 
+> test <- etmCIF(Surv(time, to != 0) ~ 1, dat.s, etype = to)
+> 
+> test.c <- etmCIF(Surv(time, to != 0) ~ cov, dat.s, etype = to)
+> 
+> all.equal(trprob(aa, "11 1"), test[[1]]$est["0", "1", ])
+[1] TRUE
+> all.equal(trprob(aa, "11 2"), test[[1]]$est["0", "2", ])
+[1] TRUE
+> 
+> all.equal(trprob(aa0, "11 1"), test.c[[1]]$est["0", "1", ])
+[1] TRUE
+> all.equal(trprob(aa0, "11 2"), test.c[[1]]$est["0", "2", ])
+[1] TRUE
+> 
+> all.equal(trprob(aa1, "11 1"), test.c[[2]]$est["0", "1", ])
+[1] TRUE
+> all.equal(trprob(aa1, "11 2"), test.c[[2]]$est["0", "2", ])
+[1] TRUE
+> 
+> test
+Call: etmCIF(formula = Surv(time, to != 0) ~ 1, data = dat.s, etype = to)
+
+          time          P      se(P) n.event
+CIF 1 4.929943 0.80910809 0.07968014      45
+CIF 2 4.929943 0.09661788 0.03290520       8
+> 
+> test.c
+Call: etmCIF(formula = Surv(time, to != 0) ~ cov, data = dat.s, etype = to)
+
+Covariate:  cov 
+	levels:  0 1 
+
+
+ cov = 0 
+          time         P      se(P) n.event
+CIF 1 2.920944 0.7024648 0.10579670      19
+CIF 2 2.920944 0.1114404 0.05338408       4
+
+ cov = 1 
+          time          P      se(P) n.event
+CIF 1 4.929943 0.80787111 0.09405073      26
+CIF 2 4.929943 0.08436022 0.04076920       4
+> 
+> summary(test)
+
+	  
+
+CIF 1 
+         P        time         var       lower     upper n.risk n.event
+ 0.0100000 0.009209855 0.000099000 0.001414712 0.0688628    100       1
+ 0.1142996 0.360023778 0.001054230 0.064945430 0.1969931     76       0
+ 0.2479372 0.784047742 0.002149357 0.170109947 0.3530034     51       0
+ 0.4405912 1.555114392 0.003517175 0.333817035 0.5642480     26       1
+ 0.5734230 2.268295292 0.004274160 0.450541377 0.7024323     11       0
+ 0.8091081 4.929943217 0.006348924 0.635954424 0.9337329      1       0
+
+CIF 2 
+          P        time          var      lower     upper n.risk n.event
+ 0.00000000 0.009209855 0.0000000000 0.00000000 0.0000000    100       0
+ 0.04246723 0.360023778 0.0004318927 0.01615074 0.1092171     76       0
+ 0.06702937 0.784047742 0.0007036620 0.03059797 0.1435033     51       0
+ 0.09661788 1.555114392 0.0010827519 0.04908158 0.1854738     26       0
+ 0.09661788 2.268295292 0.0010827519 0.04908158 0.1854738     11       0
+ 0.09661788 4.929943217 0.0010827519 0.04908158 0.1854738      1       0
+
+> summary(test.c)
+
+	 cov=0 
+
+CIF 1 
+          P        time          var      lower     upper n.risk n.event
+ 0.02222222 0.009209855 0.0004828532 0.00316047 0.1474667     45       1
+ 0.09222222 0.406113230 0.0019360322 0.03559707 0.2276215     34       0
+ 0.22668442 0.784047742 0.0045095420 0.12417599 0.3925031     23       0
+ 0.42066416 1.478827203 0.0082446289 0.26725155 0.6164448     12       1
+ 0.60941744 1.939093010 0.0095747480 0.42743893 0.7950394      6       1
+ 0.70246483 2.920943647 0.0111929419 0.49448899 0.8839905      1       0
+
+CIF 2 
+          P        time         var      lower     upper n.risk n.event
+ 0.00000000 0.009209855 0.000000000 0.00000000 0.0000000     45       0
+ 0.04844136 0.406113230 0.001116811 0.01233703 0.1801316     34       0
+ 0.07641078 0.784047742 0.001810437 0.02520184 0.2192780     23       0
+ 0.11144039 1.478827203 0.002849860 0.04267633 0.2739153     12       0
+ 0.11144039 1.939093010 0.002849860 0.04267633 0.2739153      6       0
+ 0.11144039 2.920943647 0.002849860 0.04267633 0.2739153      1       0
+
+
+	 cov=1 
+
+CIF 1 
+          P       time         var       lower     upper n.risk n.event
+ 0.01818182 0.06669232 0.000324568 0.002581315 0.1221376     55       1
+ 0.13171422 0.36002378 0.002156700 0.065024199 0.2567179     42       0
+ 0.26514875 0.80139542 0.004072829 0.162479119 0.4145201     28       0
+ 0.46217162 1.55511439 0.006255707 0.322729736 0.6273534     15       1
+ 0.59233377 2.48978047 0.007759845 0.428622952 0.7627259      7       0
+ 0.80787111 4.92994322 0.008845539 0.602318537 0.9477134      1       0
+
+CIF 2 
+          P       time          var       lower     upper n.risk n.event
+ 0.00000000 0.06669232 0.0000000000 0.000000000 0.0000000     55       0
+ 0.03743357 0.36002378 0.0006745784 0.009493953 0.1415172     42       0
+ 0.05934134 0.80139542 0.0011129497 0.019446521 0.1735097     28       0
+ 0.08436022 1.55511439 0.0016621276 0.032211300 0.2111908     15       0
+ 0.08436022 2.48978047 0.0016621276 0.032211300 0.2111908      7       0
+ 0.08436022 4.92994322 0.0016621276 0.032211300 0.2111908      1       0
+
+> 
