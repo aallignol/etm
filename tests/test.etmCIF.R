@@ -68,11 +68,11 @@ all.equal(unname(trprob(cif.exposed, "0 1")), snetm[[2]][[1]]$P)
 scif.control <- summary(cif.control, ci.fun = "cloglog")
 scif.exposed <- summary(cif.exposed, ci.fun = "cloglog")
 
-all.equal(scif.control[[3]]$lower, snetm[[1]][[3]]$lower)
-all.equal(scif.control[[3]]$upper, snetm[[1]][[3]]$upper)
+all.equal(scif.control[[4]]$lower, snetm[[1]][[3]]$lower)
+all.equal(scif.control[[4]]$upper, snetm[[1]][[3]]$upper)
 
-all.equal(scif.exposed[[3]]$lower, snetm[[2]][[3]]$lower)
-all.equal(scif.exposed[[3]]$upper, snetm[[2]][[3]]$upper)
+all.equal(scif.exposed[[4]]$lower, snetm[[2]][[3]]$lower)
+all.equal(scif.exposed[[4]]$upper, snetm[[2]][[3]]$upper)
 
 
 ### test with factors in the input
