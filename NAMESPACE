@@ -1,4 +1,4 @@
-useDynLib(etm)
+useDynLib(etm, .registration = TRUE)
 
 importFrom(Rcpp, evalCpp)
 
@@ -42,6 +42,7 @@ S3method(plot, etmCIF)
 S3method(summary, etmCIF)
 S3method(print, summary.etmCIF)
 
+## useDynLib(etm, .registration = TRUE)
 
 ## exportPattern("^[[:alpha:]]+")
 
