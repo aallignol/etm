@@ -1,15 +1,15 @@
-etm <- function(x, ...) {
+etm <- function(data, ...) {
     UseMethod("etm")
 }
 
 
-etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
+etm.data.frame <- function(data, state.names, tra, cens.name, s, t = "last",
                            covariance = TRUE, delta.na = TRUE, modif = FALSE,
                            c = 1, alpha = NULL, strata, ...) {
 
-    if (missing(x))
-        stop("Argument 'x' (the data) is missing with no default")
-    x <- data.table(x)
+    if (missing(data))
+        stop("Argument 'data' is missing with no default")
+    x <- data.table(data)
     if (missing(tra))
         stop("Argument 'tra' is missing with no default")
     if (missing(state.names))
@@ -98,7 +98,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
     t.to <- unlist(t.to)
     trans <- data.frame(from=t.from, to=t.to)
     namen <- paste(trans[, 1], trans[, 2])
-    
+
     ## test on transitions
     test <- x[, unique(paste(from, to))]
     if (!(is.null(cens.name))) {
@@ -115,7 +115,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         warning("You may have specified more possible transitions than actually present in the data")
 
     n <- length(unique(x$id))
-    
+
 ### data.table transformation
     x[, id := if (is.character(id)) as.factor(id) else id]
     if (!(is.null(cens.name))) {
@@ -147,7 +147,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         if (sum(x$entry < x$exit) != nrow(x))
             stop("Exit time from a state must be > entry time")
     }
-    
+
     x[, from := as.integer(as.character(from))]
     x[, to := as.integer(as.character(to))]
 
@@ -201,7 +201,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         var_aj <- zzz$cov
 
         dimnames(est) <- list(state.names, state.names, zzz$time)
-        
+
         if (!is.null(zzz$n.risk)) {
             colnames(nrisk) <- state.names
             nrisk <- nrisk[, !(colnames(nrisk) %in%
@@ -209,7 +209,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
                            drop = FALSE]
             dimnames(est) <- list(state.names, state.names, zzz$time)
             dimnames(nev) <- list(state.names, state.names, zzz$time)
-        
+
             if (covariance) {
                 pos <- sapply(1:length(state.names), function(i) {
                     paste(state.names, state.names[i])
@@ -222,7 +222,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         } else {
             var_aj <- NULL
         }
-        
+
         res <- list(est = est,
                     cov = var_aj,
                     time = zzz$time,
@@ -251,7 +251,7 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
         res$data <- x
         class(res) <- "etm"
     }
-    
+
     res
 }
 
@@ -261,9 +261,9 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
 ## etm.formula <- function(formula, data, subset, na.action) {
 
 ##     call <- match.call()
-##     if (missing(data)) 
+##     if (missing(data))
 ##         data <- environment(formula)
-##     if (!missing(subset)) 
+##     if (!missing(subset))
 ##         data <- subset(data, subset = subset)
 
 ##     mod <- EventHistory.frame(formula,
@@ -275,4 +275,4 @@ etm.data.frame <- function(x, state.names, tra, cens.name, s, t = "last",
 
 ##     mod
 ## }
-                              
+

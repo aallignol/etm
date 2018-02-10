@@ -9,12 +9,12 @@
   multistate model. The covariance matrix is also computed.
 }
 \usage{
-\S3method{etm}{data.frame}(x, state.names, tra, cens.name, s, t = "last",
+\S3method{etm}{data.frame}(data, state.names, tra, cens.name, s, t = "last",
     covariance = TRUE, delta.na = TRUE, modif = FALSE,
     c = 1, alpha = NULL, strata, ...)
 }
 \arguments{
-  \item{x}{data.frame of the form data.frame(id,from,to,time)
+  \item{data}{data.frame of the form data.frame(id,from,to,time)
     or (id,from,to,entry,exit)
     \describe{
     \item{id:}{patient id}
