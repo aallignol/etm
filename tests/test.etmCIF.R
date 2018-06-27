@@ -1,6 +1,8 @@
 ### test file for etmCIF.
 ### Really simple tests and comparison with etm
 
+old <- options(digits = 5)
+
 require(etm)
 
 if (!require(survival, quietly = TRUE))
@@ -143,3 +145,5 @@ test.c
 
 summary(test)
 summary(test.c)
+
+options(old)

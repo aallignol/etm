@@ -1,5 +1,8 @@
 require(etm)
 
+## Print with a bit less precision to avoid lots of notes in the comparison
+old <- options(digits = 4)
+
 ### Simple test
 
 time <- id <- 1:10
@@ -269,3 +272,5 @@ all(trprob(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trprob(bouh_female, "0 1"
 all(trcov(bouh_strat, "0 1")[[1]] == trcov(bouh_female, "0 1"))
 all(trcov(bouh_strat, c("0 1", "0 2"))[[1]] == trcov(bouh_female, c("0 1", "0 2")))
 all(trcov(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trcov(bouh_female, "0 1", c(0, 5, 10, 15)))
+
+options(old)
