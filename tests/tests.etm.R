@@ -21,6 +21,27 @@ etm1$cov["0 0", "0 0", ]
 
 all.equal(etm1$cov["0 0", "0 0",], trcov(etm1, "0 0"))
 
+### A simple test from AHR's author, where the first time is censored
+if (!require(survival)) {
+    stop("This test requires the survival package")
+}
+
+data <- data.frame(id=1:10, time=1:10, from=0, to=1, status=TRUE)
+
+tra <- matrix(FALSE, nrow=2, ncol=2)
+tra[1, 2] <- TRUE
+
+data$to[1] <- "cens"
+data$status[1] <- FALSE
+
+fit.km <- survfit(Surv(time, status) ~ 1, data=data)
+fit.etm <- etm(data, c("0","1"), tra, "cens", s=0, t="last", covariance=FALSE)
+
+data.frame(time=fit.km$time[data$status],
+           km=fit.km$surv[data$status],
+           time2=as.numeric(names(fit.etm$est[1,2,])),
+           etm=1-fit.etm$est[1,2,])
+
 
 ### a bit more complicated
 
