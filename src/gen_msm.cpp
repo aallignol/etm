@@ -103,6 +103,10 @@ RcppExport SEXP gen_msm(SEXP _times,
 		nrisk(1, from_exit[0] - 1) -= 1;
 	    }
 	    ii = 1;
+	} else {
+	    if (to[ii] != 0) nev(from_exit[ii] - 1, to[ii] - 1, 0) += 1;
+	    nrisk(1, from_exit[ii] - 1) -= 1;
+	    ++ii;
 	}
 	
 	for (int i = ii; i<n; ++i) {
@@ -112,7 +116,7 @@ RcppExport SEXP gen_msm(SEXP _times,
 		if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
 	    } else {
 		if (t < lt - 1) {
-		    if (exit[i] == times[t+1]) { // marche pas si les premiers temps sont censures
+		    if (exit[i] == times[t+1]) {
 			++t;
 			if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
 			if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
