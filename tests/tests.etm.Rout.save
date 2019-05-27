@@ -1,7 +1,7 @@
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
 Copyright (C) 2018 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin17.5.0 (64-bit)
+Platform: x86_64-apple-darwin17.6.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -45,6 +45,34 @@ Loading required package: etm
 > all.equal(etm1$cov["0 0", "0 0",], trcov(etm1, "0 0"))
 [1] TRUE
 > 
+> ### A simple test from AHR's author, where the first time is censored
+> if (!require(survival)) {
++     stop("This test requires the survival package")
++ }
+Loading required package: survival
+> 
+> data <- data.frame(id=1:10, time=1:10, from=0, to=1, status=TRUE)
+> 
+> tra <- matrix(FALSE, nrow=2, ncol=2)
+> tra[1, 2] <- TRUE
+> 
+> data$to[1] <- "cens"
+> data$status[1] <- FALSE
+> 
+> fit.km <- survfit(Surv(time, status) ~ 1, data=data)
+> fit.etm <- etm(data, c("0","1"), tra, "cens", s=0, t="last", covariance=FALSE)
+> 
+> all.equal(fit.km$surv[data$status], fit.etm$est[1,1,], check.attributes = FALSE)
+[1] TRUE
+> 
+> data$to[2] <- "cens"
+> data$status[2] <- FALSE
+> 
+> fit.km <- survfit(Surv(time, status) ~ 1, data=data)
+> fit.etm <- etm(data, c("0","1"), tra, "cens", s=0, t="last", covariance=FALSE)
+> 
+> all.equal(fit.km$surv[data$status], fit.etm$est[1,1,], check.attributes = FALSE)
+[1] TRUE
 > 
 > ### a bit more complicated
 > 
@@ -710,4 +738,4 @@ Transition 1 2
 > 
 > proc.time()
    user  system elapsed 
- 10.814   0.196  10.916 
+ 10.864   0.180  10.930 

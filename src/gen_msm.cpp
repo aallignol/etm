@@ -90,13 +90,13 @@ RcppExport SEXP gen_msm(SEXP _times,
 	
     } else {
 
-	// A code path for first events censored
+	// A code path for first event(s) censored
 	int ii = 0;
 	while (to[ii] == 0) {
-	    nrisk(ii, from_exit[ii] - 1) -= 1;
+	    nrisk(0, from_exit[ii] - 1) -= 1;
 	    ++ii;
 	}
-
+	
 	if (ii == 0) {
 	    if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
 	    if (n > 1) {

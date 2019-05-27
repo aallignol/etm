@@ -19,7 +19,7 @@ RcppExport SEXP cov_aj(SEXP __time,
     
     const int lt = _time.size();
     const int nstate = dims(0);
-    const int D = pow(nstate, 2);
+    const int D = nstate * nstate; // to appease Solaris compiler
 
     cube est(_est.begin(), nstate, nstate, lt, false);
     cube nevent(_nevent.begin(), nstate, nstate, lt, false);

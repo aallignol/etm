@@ -37,11 +37,15 @@ data$status[1] <- FALSE
 fit.km <- survfit(Surv(time, status) ~ 1, data=data)
 fit.etm <- etm(data, c("0","1"), tra, "cens", s=0, t="last", covariance=FALSE)
 
-data.frame(time=fit.km$time[data$status],
-           km=fit.km$surv[data$status],
-           time2=as.numeric(names(fit.etm$est[1,2,])),
-           etm=1-fit.etm$est[1,2,])
+all.equal(fit.km$surv[data$status], fit.etm$est[1,1,], check.attributes = FALSE)
 
+data$to[2] <- "cens"
+data$status[2] <- FALSE
+
+fit.km <- survfit(Surv(time, status) ~ 1, data=data)
+fit.etm <- etm(data, c("0","1"), tra, "cens", s=0, t="last", covariance=FALSE)
+
+all.equal(fit.km$surv[data$status], fit.etm$est[1,1,], check.attributes = FALSE)
 
 ### a bit more complicated
 
