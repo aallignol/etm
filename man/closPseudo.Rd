@@ -84,41 +84,44 @@ closPseudo(data, state.names, tra, cens.name, s = 0,
   \code{\link[parallel]{mclapply}}, \code{\link[etm]{clos}}
 }
 \examples{
-library(kmi)
+if(requireNamespace(kmi, quietly = TRUE)) {
 
 ## data in kmi package
-data(icu.pneu)
-my.icu.pneu <- icu.pneu
+    data(icu.pneu)
+    my.icu.pneu <- icu.pneu
+    
+    my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
+    masque <- diff(my.icu.pneu$id)
+    
+    my.icu.pneu$from <- 0
+    my.icu.pneu$from[c(1, masque) == 0] <- 1
+    
+    my.icu.pneu$to2 <- my.icu.pneu$event
+    my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
+    my.icu.pneu$to2[c(masque, 1) == 0] <- 1
+    
+    
+    my.icu.pneu$to <- ifelse(my.icu.pneu$to2 \%in\% c(2, 3), 2,
+                             my.icu.pneu$to2)
 
-my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
-masque <- diff(my.icu.pneu$id)
+    my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
+                                   "to2", "age", "sex")]
+    names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
 
-my.icu.pneu$from <- 0
-my.icu.pneu$from[c(1, masque) == 0] <- 1
-
-my.icu.pneu$to2 <- my.icu.pneu$event
-my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
-my.icu.pneu$to2[c(masque, 1) == 0] <- 1
-
-
-my.icu.pneu$to <- ifelse(my.icu.pneu$to2 \%in\% c(2, 3), 2,
-                         my.icu.pneu$to2)
-
-my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
-                               "to2", "age", "sex")]
-names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
-
-## computation of the pseudo-observations
-\dontrun{
-ps.icu.pneu <- closPseudo(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens",
-                          formula = ~ sex + age)
-
-## regression model using geepack
-require(geepack)
-fit <- geeglm(ps.e.phi ~ sex + age, id = id, data = ps.icu.pneu$pseudoData,
-              family = gaussian)
-
-summary(fit)
+    ## computation of the pseudo-observations
+    \dontrun{
+        ps.icu.pneu <- closPseudo(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens",
+                                  formula = ~ sex + age)
+        
+        ## regression model using geepack
+        require(geepack)
+        fit <- geeglm(ps.e.phi ~ sex + age, id = id, data = ps.icu.pneu$pseudoData,
+                      family = gaussian)
+        
+        summary(fit)
+    }
+} else {
+    print("This example requires the kmi package")
 }
 }
 
