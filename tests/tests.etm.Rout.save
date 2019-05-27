@@ -1,7 +1,7 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
-Copyright (C) 2018 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin17.6.0 (64-bit)
+R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin18.5.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -588,154 +588,56 @@ Expected change in LOS with weight.other: 1.951
 > ### Test the stratified calls
 > ######################################
 > 
-> if (!require(kmi, quietly = TRUE))
-+     stop("The following tests require the 'kmi' package")
-> 
-> library(etm)
-> 
-> data(icu.pneu)
-> my.icu.pneu <- icu.pneu
-> 
-> my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
-> masque <- diff(my.icu.pneu$id)
-> 
-> my.icu.pneu$from <- 0
-> my.icu.pneu$from[c(1, masque) == 0] <- 1
-> 
-> my.icu.pneu$to2 <- my.icu.pneu$event
-> my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
-> my.icu.pneu$to2[c(masque, 1) == 0] <- 1
-> 
-> 
-> my.icu.pneu$to <- ifelse(my.icu.pneu$to2 %in% c(2, 3), 2,
-+                          my.icu.pneu$to2)
-> 
-> my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
-+                                "to2", "age", "sex")]
-> names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
-> 
-> bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
-> 
-> bouh_female <- etm(my.icu.pneu[my.icu.pneu$sex == "F", ],
-+                    c("0", "1", "2"), tra_ill(), "cens", 0)
-> 
-> all(bouh_strat[[1]]$est == bouh_female$est)
-[1] TRUE
-> 
-> ## Test the summary
-> the_summary <- summary(bouh_strat)
-> the_summary
-sex == "F" 
-
-Transition 0 0 
-       P time       var    lower   upper n.risk n.event
- 0.99819    1 3.276e-06 0.994641 1.00000    552       0
- 0.25589   14 3.465e-04 0.219404 0.29237    154       0
- 0.08389   29 1.406e-04 0.060653 0.10714     50       0
- 0.02876   43 5.264e-05 0.014543 0.04298     16       0
- 0.01255   57 2.458e-05 0.002833 0.02227      7       0
- 0.00000   86 0.000e+00 0.000000 0.00000      0       0
-
-Transition 0 1 
-        P time       var   lower   upper n.risk n.event
- 0.000000    1 0.000e+00 0.00000 0.00000    552       0
- 0.052655   14 9.058e-05 0.03400 0.07131    154       1
- 0.028005   29 5.032e-05 0.01410 0.04191     50       0
- 0.014936   43 2.733e-05 0.00469 0.02518     16       0
- 0.005601   57 1.038e-05 0.00000 0.01192      7       0
- 0.000000   86 0.000e+00 0.00000 0.00000      0       0
-
-Transition 0 2 
-        P time       var  lower    upper n.risk n.event
- 0.001812    1 3.276e-06 0.0000 0.005359    552       1
- 0.691459   14 3.880e-04 0.6529 0.730064    154      13
- 0.888101   29 1.823e-04 0.8616 0.914567     50       5
- 0.956300   43 7.840e-05 0.9389 0.973655     16       1
- 0.981848   57 3.471e-05 0.9703 0.993394      7       1
- 1.000000   86 0.000e+00 1.0000 1.000000      0       0
-
-Transition 1 1 
-       P time      var   lower  upper n.risk n.event
- 1.00000    1 0.000000 1.00000 1.0000      0       0
- 0.89474   14 0.004957 0.75674 1.0000     27       0
- 0.35627   29 0.006364 0.19992 0.5126     17       0
- 0.19001   43 0.003916 0.06736 0.3127      8       0
- 0.07125   57 0.001608 0.00000 0.1499      3       0
- 0.00000   86 0.000000 0.00000 0.0000      1       0
-
-Transition 1 2 
-      P time       var  lower  upper n.risk n.event
- 0.0000    1 0.000e+00 0.0000 0.0000      0       0
- 0.1053   14 4.957e-03 0.0000 0.2433     27       0
- 0.6437   29 6.364e-03 0.4874 0.8001     17       2
- 0.8100   43 3.916e-03 0.6873 0.9326      8       0
- 0.9287   57 1.608e-03 0.8501 1.0000      3       0
- 1.0000   86 4.770e-18 1.0000 1.0000      1       1
-
-sex == "M" 
-
-Transition 0 0 
-        P time       var    lower   upper n.risk n.event
- 0.976347    2 3.035e-05 0.965550 0.98714    761       0
- 0.186247   19 2.012e-04 0.158445 0.21405    151       0
- 0.071497   35 9.063e-05 0.052838 0.09016     54       0
- 0.018589   54 2.580e-05 0.008634 0.02854     15       0
- 0.007746   77 1.148e-05 0.001105 0.01439      5       0
- 0.000000  460 0.000e+00 0.000000 0.00000      1       0
-
-Transition 0 1 
-        P time       var   lower    upper n.risk n.event
- 0.000000    2 0.000e+00 0.00000 0.000000    761       0
- 0.052695   19 6.577e-05 0.03680 0.068590    151       0
- 0.025063   35 3.371e-05 0.01368 0.036444     54       0
- 0.013247   54 1.866e-05 0.00478 0.021713     15       0
- 0.003312   77 5.279e-06 0.00000 0.007815      5       0
- 0.000000  460 0.000e+00 0.00000 0.000000      1       0
-
-Transition 0 2 
-       P time       var   lower   upper n.risk n.event
- 0.02365    2 3.035e-05 0.01286 0.03445    761      18
- 0.76106   19 2.410e-04 0.73063 0.79149    151      12
- 0.90344   35 1.193e-04 0.88204 0.92484     54       4
- 0.96816   54 4.374e-05 0.95520 0.98113     15       2
- 0.98894   77 1.668e-05 0.98094 0.99695      5       0
- 1.00000  460 1.016e-20 1.00000 1.00000      1       1
-
-Transition 1 1 
-      P time      var   lower   upper n.risk n.event
- 1.0000    2 0.000000 1.00000 1.00000      0       0
- 0.5620   19 0.005905 0.41137 0.71259     43       0
- 0.2024   35 0.002450 0.10542 0.29945     18       0
- 0.1012   54 0.001182 0.03384 0.16859      9       0
- 0.0253   77 0.000314 0.00000 0.06003      3       0
- 0.0000  460 0.000000 0.00000 0.00000      0       0
-
-Transition 1 2 
-      P time       var  lower  upper n.risk n.event
- 0.0000    2 0.000e+00 0.0000 0.0000      0       0
- 0.4380   19 5.905e-03 0.2874 0.5886     43       3
- 0.7976   35 2.450e-03 0.7005 0.8946     18       1
- 0.8988   54 1.182e-03 0.8314 0.9662      9       0
- 0.9747   77 3.140e-04 0.9400 1.0000      3       1
- 1.0000  460 3.686e-18 1.0000 1.0000      0       0
-
-> 
-> ## Test trprob
-> all(trprob(bouh_strat, "0 1")[[1]] == trprob(bouh_female, "0 1"))
-[1] TRUE
-> all(trprob(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trprob(bouh_female, "0 1", c(0, 5, 10, 15)))
-[1] TRUE
-> 
-> ## Test trcov
-> all(trcov(bouh_strat, "0 1")[[1]] == trcov(bouh_female, "0 1"))
-[1] TRUE
-> all(trcov(bouh_strat, c("0 1", "0 2"))[[1]] == trcov(bouh_female, c("0 1", "0 2")))
-[1] TRUE
-> all(trcov(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trcov(bouh_female, "0 1", c(0, 5, 10, 15)))
+> if (require("kmi", quietly = TRUE)) {
++     library(etm)
++ 
++     data(icu.pneu)
++     my.icu.pneu <- icu.pneu
++ 
++     my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
++     masque <- diff(my.icu.pneu$id)
++ 
++     my.icu.pneu$from <- 0
++     my.icu.pneu$from[c(1, masque) == 0] <- 1
++ 
++     my.icu.pneu$to2 <- my.icu.pneu$event
++     my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
++     my.icu.pneu$to2[c(masque, 1) == 0] <- 1
++ 
++ 
++     my.icu.pneu$to <- ifelse(my.icu.pneu$to2 %in% c(2, 3), 2,
++                              my.icu.pneu$to2)
++ 
++     my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
++                                    "to2", "age", "sex")]
++     names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
++ 
++     bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
++ 
++     bouh_female <- etm(my.icu.pneu[my.icu.pneu$sex == "F", ],
++                        c("0", "1", "2"), tra_ill(), "cens", 0)
++ 
++     all(bouh_strat[[1]]$est == bouh_female$est)
++ 
++     ## Test the summary
++     the_summary <- summary(bouh_strat)
++     the_summary
++ 
++     ## Test trprob
++     all(trprob(bouh_strat, "0 1")[[1]] == trprob(bouh_female, "0 1"))
++     all(trprob(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trprob(bouh_female, "0 1", c(0, 5, 10, 15)))
++ 
++     ## Test trcov
++     all(trcov(bouh_strat, "0 1")[[1]] == trcov(bouh_female, "0 1"))
++     all(trcov(bouh_strat, c("0 1", "0 2"))[[1]] == trcov(bouh_female, c("0 1", "0 2")))
++     all(trcov(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trcov(bouh_female, "0 1", c(0, 5, 10, 15)))
++ } else {
++     print("These tests require the kmi package")
++ }
 [1] TRUE
 > 
 > options(old)
 > 
 > proc.time()
    user  system elapsed 
- 10.864   0.180  10.930 
+ 25.171   0.549  13.970 

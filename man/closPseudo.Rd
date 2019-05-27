@@ -84,9 +84,9 @@ closPseudo(data, state.names, tra, cens.name, s = 0,
   \code{\link[parallel]{mclapply}}, \code{\link[etm]{clos}}
 }
 \examples{
-if(requireNamespace(kmi, quietly = TRUE)) {
+if(require("kmi", quietly = TRUE)) {
 
-## data in kmi package
+    ## data in kmi package
     data(icu.pneu)
     my.icu.pneu <- icu.pneu
     

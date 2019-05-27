@@ -5,81 +5,81 @@ old <- options(digits = 5)
 
 require(etm)
 
-if (!require(survival, quietly = TRUE))
-    stop("The following tests require the 'survival' package")
+if (!require(survival, quietly = TRUE)) {
+    print("The following tests require the 'survival' package")
+} else {
+
+    data(abortion)
+
+    from <- rep(0, nrow(abortion))
+    to <- abortion$cause
+    entry <- abortion$entry
+    exit <- abortion$exit
+    id <- 1:nrow(abortion)
+    data <- data.frame(id, from, to, entry, exit, group = abortion$group)
+
+    ## Computation of the CIFs with etm
+    tra <- matrix(FALSE, 4, 4)
+    tra[1, 2:4] <- TRUE
+
+    cif.control <- etm(data[data$group == 0, ], c("0", "1", "2", "3"),
+                       tra, NULL, 0)
+    cif.exposed <- etm(data[data$group == 1, ], c("0", "1", "2", "3"),
+                       tra, NULL, 0)
 
 
-data(abortion)
-
-from <- rep(0, nrow(abortion))
-to <- abortion$cause
-entry <- abortion$entry
-exit <- abortion$exit
-id <- 1:nrow(abortion)
-data <- data.frame(id, from, to, entry, exit, group = abortion$group)
-
-## Computation of the CIFs with etm
-tra <- matrix(FALSE, 4, 4)
-tra[1, 2:4] <- TRUE
-
-cif.control <- etm(data[data$group == 0, ], c("0", "1", "2", "3"),
-                        tra, NULL, 0)
-cif.exposed <- etm(data[data$group == 1, ], c("0", "1", "2", "3"),
-                        tra, NULL, 0)
-
-
-## Computation of the CIFs with etmCIF
-netm <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,
-               etype = cause, failcode = 3)
+    ## Computation of the CIFs with etmCIF
+    netm <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,
+                   etype = cause, failcode = 3)
 
 ### let's do some comparisons :-)
 
-all.equal(trprob(cif.control, "0 3"), netm[[1]]$est["0", "3", ])
-all.equal(trprob(cif.control, "0 2"), netm[[1]]$est["0", "2", ])
-all.equal(trprob(cif.control, "0 1"), netm[[1]]$est["0", "1", ])
+    all.equal(trprob(cif.control, "0 3"), netm[[1]]$est["0", "3", ])
+    all.equal(trprob(cif.control, "0 2"), netm[[1]]$est["0", "2", ])
+    all.equal(trprob(cif.control, "0 1"), netm[[1]]$est["0", "1", ])
 
-all.equal(trprob(cif.exposed, "0 3"), netm[[2]]$est["0", "3", ])
-all.equal(trprob(cif.exposed, "0 2"), netm[[2]]$est["0", "2", ])
-all.equal(trprob(cif.exposed, "0 1"), netm[[2]]$est["0", "1", ])
-
-
-all.equal(trcov(cif.control, "0 3"), netm[[1]]$cov["0 3", "0 3", ])
-all.equal(trcov(cif.control, "0 2"), netm[[1]]$cov["0 2", "0 2", ])
-all.equal(trcov(cif.control, "0 1"), netm[[1]]$cov["0 1", "0 1", ])
-
-all.equal(trcov(cif.exposed, "0 3"), netm[[2]]$cov["0 3", "0 3", ])
-all.equal(trcov(cif.exposed, "0 2"), netm[[2]]$cov["0 2", "0 2", ])
-all.equal(trcov(cif.exposed, "0 1"), netm[[2]]$cov["0 1", "0 1", ])
+    all.equal(trprob(cif.exposed, "0 3"), netm[[2]]$est["0", "3", ])
+    all.equal(trprob(cif.exposed, "0 2"), netm[[2]]$est["0", "2", ])
+    all.equal(trprob(cif.exposed, "0 1"), netm[[2]]$est["0", "1", ])
 
 
-netm
+    all.equal(trcov(cif.control, "0 3"), netm[[1]]$cov["0 3", "0 3", ])
+    all.equal(trcov(cif.control, "0 2"), netm[[1]]$cov["0 2", "0 2", ])
+    all.equal(trcov(cif.control, "0 1"), netm[[1]]$cov["0 1", "0 1", ])
 
-## test on the summary
-snetm <- summary(netm)
+    all.equal(trcov(cif.exposed, "0 3"), netm[[2]]$cov["0 3", "0 3", ])
+    all.equal(trcov(cif.exposed, "0 2"), netm[[2]]$cov["0 2", "0 2", ])
+    all.equal(trcov(cif.exposed, "0 1"), netm[[2]]$cov["0 1", "0 1", ])
 
-snetm
 
-all.equal(unname(trprob(cif.control, "0 3")), snetm[[1]][[3]]$P)
-all.equal(unname(trprob(cif.control, "0 2")), snetm[[1]][[2]]$P)
-all.equal(unname(trprob(cif.control, "0 1")), snetm[[1]][[1]]$P)
+    netm
 
-all.equal(unname(trprob(cif.exposed, "0 3")), snetm[[2]][[3]]$P)
-all.equal(unname(trprob(cif.exposed, "0 2")), snetm[[2]][[2]]$P)
-all.equal(unname(trprob(cif.exposed, "0 1")), snetm[[2]][[1]]$P)
+    ## test on the summary
+    snetm <- summary(netm)
 
-scif.control <- summary(cif.control, ci.fun = "cloglog")
-scif.exposed <- summary(cif.exposed, ci.fun = "cloglog")
+    snetm
 
-all.equal(scif.control[[4]]$lower, snetm[[1]][[3]]$lower)
-all.equal(scif.control[[4]]$upper, snetm[[1]][[3]]$upper)
+    all.equal(unname(trprob(cif.control, "0 3")), snetm[[1]][[3]]$P)
+    all.equal(unname(trprob(cif.control, "0 2")), snetm[[1]][[2]]$P)
+    all.equal(unname(trprob(cif.control, "0 1")), snetm[[1]][[1]]$P)
 
-all.equal(scif.exposed[[4]]$lower, snetm[[2]][[3]]$lower)
-all.equal(scif.exposed[[4]]$upper, snetm[[2]][[3]]$upper)
+    all.equal(unname(trprob(cif.exposed, "0 3")), snetm[[2]][[3]]$P)
+    all.equal(unname(trprob(cif.exposed, "0 2")), snetm[[2]][[2]]$P)
+    all.equal(unname(trprob(cif.exposed, "0 1")), snetm[[2]][[1]]$P)
 
+    scif.control <- summary(cif.control, ci.fun = "cloglog")
+    scif.exposed <- summary(cif.exposed, ci.fun = "cloglog")
+
+    all.equal(scif.control[[4]]$lower, snetm[[1]][[3]]$lower)
+    all.equal(scif.control[[4]]$upper, snetm[[1]][[3]]$upper)
+
+    all.equal(scif.exposed[[4]]$lower, snetm[[2]][[3]]$lower)
+    all.equal(scif.exposed[[4]]$upper, snetm[[2]][[3]]$upper)
+}
 
 ### test with factors in the input
 abortion$status <- with(abortion, ifelse(cause == 2, "life birth",
-                                         ifelse(cause == 1, "ETOP", "spontaneous abortion")))
+                                  ifelse(cause == 1, "ETOP", "spontaneous abortion")))
 
 abortion$status <- factor(abortion$status)
 

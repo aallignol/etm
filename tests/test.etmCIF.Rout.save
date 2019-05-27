@@ -1,7 +1,7 @@
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
-Copyright (C) 2018 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin17.5.0 (64-bit)
+R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin18.5.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -25,181 +25,82 @@ Type 'q()' to quit R.
 > require(etm)
 Loading required package: etm
 > 
-> if (!require(survival, quietly = TRUE))
-+     stop("The following tests require the 'survival' package")
-> 
-> 
-> data(abortion)
-> 
-> from <- rep(0, nrow(abortion))
-> to <- abortion$cause
-> entry <- abortion$entry
-> exit <- abortion$exit
-> id <- 1:nrow(abortion)
-> data <- data.frame(id, from, to, entry, exit, group = abortion$group)
-> 
-> ## Computation of the CIFs with etm
-> tra <- matrix(FALSE, 4, 4)
-> tra[1, 2:4] <- TRUE
-> 
-> cif.control <- etm(data[data$group == 0, ], c("0", "1", "2", "3"),
-+                         tra, NULL, 0)
-> cif.exposed <- etm(data[data$group == 1, ], c("0", "1", "2", "3"),
-+                         tra, NULL, 0)
-> 
-> 
-> ## Computation of the CIFs with etmCIF
-> netm <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,
-+                etype = cause, failcode = 3)
-> 
-> ### let's do some comparisons :-)
-> 
-> all.equal(trprob(cif.control, "0 3"), netm[[1]]$est["0", "3", ])
+> if (!require(survival, quietly = TRUE)) {
++     print("The following tests require the 'survival' package")
++ } else {
++ 
++     data(abortion)
++ 
++     from <- rep(0, nrow(abortion))
++     to <- abortion$cause
++     entry <- abortion$entry
++     exit <- abortion$exit
++     id <- 1:nrow(abortion)
++     data <- data.frame(id, from, to, entry, exit, group = abortion$group)
++ 
++     ## Computation of the CIFs with etm
++     tra <- matrix(FALSE, 4, 4)
++     tra[1, 2:4] <- TRUE
++ 
++     cif.control <- etm(data[data$group == 0, ], c("0", "1", "2", "3"),
++                        tra, NULL, 0)
++     cif.exposed <- etm(data[data$group == 1, ], c("0", "1", "2", "3"),
++                        tra, NULL, 0)
++ 
++ 
++     ## Computation of the CIFs with etmCIF
++     netm <- etmCIF(Surv(entry, exit, cause != 0) ~ group, abortion,
++                    etype = cause, failcode = 3)
++ 
++ ### let's do some comparisons :-)
++ 
++     all.equal(trprob(cif.control, "0 3"), netm[[1]]$est["0", "3", ])
++     all.equal(trprob(cif.control, "0 2"), netm[[1]]$est["0", "2", ])
++     all.equal(trprob(cif.control, "0 1"), netm[[1]]$est["0", "1", ])
++ 
++     all.equal(trprob(cif.exposed, "0 3"), netm[[2]]$est["0", "3", ])
++     all.equal(trprob(cif.exposed, "0 2"), netm[[2]]$est["0", "2", ])
++     all.equal(trprob(cif.exposed, "0 1"), netm[[2]]$est["0", "1", ])
++ 
++ 
++     all.equal(trcov(cif.control, "0 3"), netm[[1]]$cov["0 3", "0 3", ])
++     all.equal(trcov(cif.control, "0 2"), netm[[1]]$cov["0 2", "0 2", ])
++     all.equal(trcov(cif.control, "0 1"), netm[[1]]$cov["0 1", "0 1", ])
++ 
++     all.equal(trcov(cif.exposed, "0 3"), netm[[2]]$cov["0 3", "0 3", ])
++     all.equal(trcov(cif.exposed, "0 2"), netm[[2]]$cov["0 2", "0 2", ])
++     all.equal(trcov(cif.exposed, "0 1"), netm[[2]]$cov["0 1", "0 1", ])
++ 
++ 
++     netm
++ 
++     ## test on the summary
++     snetm <- summary(netm)
++ 
++     snetm
++ 
++     all.equal(unname(trprob(cif.control, "0 3")), snetm[[1]][[3]]$P)
++     all.equal(unname(trprob(cif.control, "0 2")), snetm[[1]][[2]]$P)
++     all.equal(unname(trprob(cif.control, "0 1")), snetm[[1]][[1]]$P)
++ 
++     all.equal(unname(trprob(cif.exposed, "0 3")), snetm[[2]][[3]]$P)
++     all.equal(unname(trprob(cif.exposed, "0 2")), snetm[[2]][[2]]$P)
++     all.equal(unname(trprob(cif.exposed, "0 1")), snetm[[2]][[1]]$P)
++ 
++     scif.control <- summary(cif.control, ci.fun = "cloglog")
++     scif.exposed <- summary(cif.exposed, ci.fun = "cloglog")
++ 
++     all.equal(scif.control[[4]]$lower, snetm[[1]][[3]]$lower)
++     all.equal(scif.control[[4]]$upper, snetm[[1]][[3]]$upper)
++ 
++     all.equal(scif.exposed[[4]]$lower, snetm[[2]][[3]]$lower)
++     all.equal(scif.exposed[[4]]$upper, snetm[[2]][[3]]$upper)
++ }
 [1] TRUE
-> all.equal(trprob(cif.control, "0 2"), netm[[1]]$est["0", "2", ])
-[1] TRUE
-> all.equal(trprob(cif.control, "0 1"), netm[[1]]$est["0", "1", ])
-[1] TRUE
-> 
-> all.equal(trprob(cif.exposed, "0 3"), netm[[2]]$est["0", "3", ])
-[1] TRUE
-> all.equal(trprob(cif.exposed, "0 2"), netm[[2]]$est["0", "2", ])
-[1] TRUE
-> all.equal(trprob(cif.exposed, "0 1"), netm[[2]]$est["0", "1", ])
-[1] TRUE
-> 
-> 
-> all.equal(trcov(cif.control, "0 3"), netm[[1]]$cov["0 3", "0 3", ])
-[1] TRUE
-> all.equal(trcov(cif.control, "0 2"), netm[[1]]$cov["0 2", "0 2", ])
-[1] TRUE
-> all.equal(trcov(cif.control, "0 1"), netm[[1]]$cov["0 1", "0 1", ])
-[1] TRUE
-> 
-> all.equal(trcov(cif.exposed, "0 3"), netm[[2]]$cov["0 3", "0 3", ])
-[1] TRUE
-> all.equal(trcov(cif.exposed, "0 2"), netm[[2]]$cov["0 2", "0 2", ])
-[1] TRUE
-> all.equal(trcov(cif.exposed, "0 1"), netm[[2]]$cov["0 1", "0 1", ])
-[1] TRUE
-> 
-> 
-> netm
-Call: etmCIF(formula = Surv(entry, exit, cause != 0) ~ group, data = abortion, 
-    etype = cause, failcode = 3)
-
-Covariate:  group 
-	levels:  0 1 
-
-
- group = 0 
-      time        P     se(P) n.event
-CIF 1   43 0.040159 0.0092578      20
-CIF 2   43 0.799059 0.0221865     924
-CIF 3   43 0.160781 0.0213261      69
-
- group = 1 
-      time       P    se(P) n.event
-CIF 1   42 0.28511 0.042493      38
-CIF 2   42 0.35257 0.042139      92
-CIF 3   42 0.36232 0.049473      43
-> 
-> ## test on the summary
-> snetm <- summary(netm)
-> 
-> snetm
-
-	 group=0 
-
-CIF 1 
-        P time        var    lower    upper n.risk n.event
- 0.000000    6 0.0000e+00 0.000000 0.000000    117       0
- 0.038955   13 8.4440e-05 0.024488 0.061694    645       1
- 0.040159   26 8.5707e-05 0.025513 0.062939    846       0
- 0.040159   36 8.5707e-05 0.025513 0.062939    876       0
- 0.040159   40 8.5707e-05 0.025513 0.062939    554       0
- 0.040159   43 8.5707e-05 0.025513 0.062939      6       0
-
-CIF 2 
-        P time        var    lower    upper n.risk n.event
- 0.000000    6 0.0000e+00 0.000000 0.000000    117       0
- 0.000000   13 0.0000e+00 0.000000 0.000000    645       0
- 0.000000   26 0.0000e+00 0.000000 0.000000    846       0
- 0.053197   36 4.6195e-05 0.041379 0.068268    876      25
- 0.563121   40 3.8801e-04 0.524924 0.602021    554     280
- 0.799059   43 4.9224e-04 0.753969 0.840613      6       6
-
-CIF 3 
-        P time        var   lower    upper n.risk n.event
- 0.034188    6 0.00028222 0.01297 0.088523    117       4
- 0.150468   13 0.00045513 0.11360 0.197901    645       1
- 0.159904   26 0.00045498 0.12274 0.206925    846       1
- 0.160781   36 0.00045480 0.12360 0.207757    876       1
- 0.160781   40 0.00045480 0.12360 0.207757    554       0
- 0.160781   43 0.00045480 0.12360 0.207757      6       0
-
-
-	 group=1 
-
-CIF 1 
-       P time       var   lower   upper n.risk n.event
- 0.00000    6 0.0000000 0.00000 0.00000     35       0
- 0.26048   13 0.0017854 0.18795 0.35425     90       0
- 0.28115   21 0.0018028 0.20742 0.37423     93       1
- 0.28511   34 0.0018057 0.21116 0.37806     89       0
- 0.28511   39 0.0018057 0.21116 0.37806     59       0
- 0.28511   42 0.0018057 0.21116 0.37806      6       0
-
-CIF 2 
-        P time        var    lower    upper n.risk n.event
- 0.000000    6 0.0000e+00 0.000000 0.000000     35       0
- 0.000000   13 0.0000e+00 0.000000 0.000000     90       0
- 0.000000   21 0.0000e+00 0.000000 0.000000     93       0
- 0.023073   34 9.0514e-05 0.010252 0.051504     89       2
- 0.180156   39 8.0126e-04 0.131765 0.243663     59      13
- 0.352565   42 1.7757e-03 0.276882 0.441775      6       6
-
-CIF 3 
-        P time       var    lower   upper n.risk n.event
- 0.057143    6 0.0015394 0.014605 0.20968     35       2
- 0.333246   13 0.0025280 0.245337 0.44216     90       4
- 0.350702   21 0.0024827 0.262769 0.45762     93       0
- 0.358492   34 0.0024593 0.270627 0.46448     89       0
- 0.358492   39 0.0024593 0.270627 0.46448     59       0
- 0.362323   42 0.0024476 0.274499 0.46785      6       0
-
-> 
-> all.equal(unname(trprob(cif.control, "0 3")), snetm[[1]][[3]]$P)
-[1] TRUE
-> all.equal(unname(trprob(cif.control, "0 2")), snetm[[1]][[2]]$P)
-[1] TRUE
-> all.equal(unname(trprob(cif.control, "0 1")), snetm[[1]][[1]]$P)
-[1] TRUE
-> 
-> all.equal(unname(trprob(cif.exposed, "0 3")), snetm[[2]][[3]]$P)
-[1] TRUE
-> all.equal(unname(trprob(cif.exposed, "0 2")), snetm[[2]][[2]]$P)
-[1] TRUE
-> all.equal(unname(trprob(cif.exposed, "0 1")), snetm[[2]][[1]]$P)
-[1] TRUE
-> 
-> scif.control <- summary(cif.control, ci.fun = "cloglog")
-> scif.exposed <- summary(cif.exposed, ci.fun = "cloglog")
-> 
-> all.equal(scif.control[[4]]$lower, snetm[[1]][[3]]$lower)
-[1] TRUE
-> all.equal(scif.control[[4]]$upper, snetm[[1]][[3]]$upper)
-[1] TRUE
-> 
-> all.equal(scif.exposed[[4]]$lower, snetm[[2]][[3]]$lower)
-[1] TRUE
-> all.equal(scif.exposed[[4]]$upper, snetm[[2]][[3]]$upper)
-[1] TRUE
-> 
 > 
 > ### test with factors in the input
 > abortion$status <- with(abortion, ifelse(cause == 2, "life birth",
-+                                          ifelse(cause == 1, "ETOP", "spontaneous abortion")))
++                                   ifelse(cause == 1, "ETOP", "spontaneous abortion")))
 > 
 > abortion$status <- factor(abortion$status)
 > 
@@ -519,4 +420,4 @@ CIF 2
 > 
 > proc.time()
    user  system elapsed 
-  1.242   0.103   1.214 
+  1.487   0.119   1.389 

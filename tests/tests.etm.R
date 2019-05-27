@@ -252,50 +252,51 @@ all.equal(ref, newdat)
 ### Test the stratified calls
 ######################################
 
-if (!require(kmi, quietly = TRUE))
-    stop("The following tests require the 'kmi' package")
+if (require("kmi", quietly = TRUE)) {
+    library(etm)
 
-library(etm)
+    data(icu.pneu)
+    my.icu.pneu <- icu.pneu
 
-data(icu.pneu)
-my.icu.pneu <- icu.pneu
+    my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
+    masque <- diff(my.icu.pneu$id)
 
-my.icu.pneu <- my.icu.pneu[order(my.icu.pneu$id, my.icu.pneu$start), ]
-masque <- diff(my.icu.pneu$id)
+    my.icu.pneu$from <- 0
+    my.icu.pneu$from[c(1, masque) == 0] <- 1
 
-my.icu.pneu$from <- 0
-my.icu.pneu$from[c(1, masque) == 0] <- 1
-
-my.icu.pneu$to2 <- my.icu.pneu$event
-my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
-my.icu.pneu$to2[c(masque, 1) == 0] <- 1
+    my.icu.pneu$to2 <- my.icu.pneu$event
+    my.icu.pneu$to2[my.icu.pneu$status == 0] <- "cens"
+    my.icu.pneu$to2[c(masque, 1) == 0] <- 1
 
 
-my.icu.pneu$to <- ifelse(my.icu.pneu$to2 %in% c(2, 3), 2,
-                         my.icu.pneu$to2)
+    my.icu.pneu$to <- ifelse(my.icu.pneu$to2 %in% c(2, 3), 2,
+                             my.icu.pneu$to2)
 
-my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
-                               "to2", "age", "sex")]
-names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
+    my.icu.pneu <- my.icu.pneu[, c("id", "start", "stop", "from", "to",
+                                   "to2", "age", "sex")]
+    names(my.icu.pneu)[c(2, 3)] <- c("entry", "exit")
 
-bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
+    bouh_strat <- etm(my.icu.pneu, c("0", "1", "2"), tra_ill(), "cens", 0, strata = "sex")
 
-bouh_female <- etm(my.icu.pneu[my.icu.pneu$sex == "F", ],
-                   c("0", "1", "2"), tra_ill(), "cens", 0)
+    bouh_female <- etm(my.icu.pneu[my.icu.pneu$sex == "F", ],
+                       c("0", "1", "2"), tra_ill(), "cens", 0)
 
-all(bouh_strat[[1]]$est == bouh_female$est)
+    all(bouh_strat[[1]]$est == bouh_female$est)
 
-## Test the summary
-the_summary <- summary(bouh_strat)
-the_summary
+    ## Test the summary
+    the_summary <- summary(bouh_strat)
+    the_summary
 
-## Test trprob
-all(trprob(bouh_strat, "0 1")[[1]] == trprob(bouh_female, "0 1"))
-all(trprob(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trprob(bouh_female, "0 1", c(0, 5, 10, 15)))
+    ## Test trprob
+    all(trprob(bouh_strat, "0 1")[[1]] == trprob(bouh_female, "0 1"))
+    all(trprob(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trprob(bouh_female, "0 1", c(0, 5, 10, 15)))
 
-## Test trcov
-all(trcov(bouh_strat, "0 1")[[1]] == trcov(bouh_female, "0 1"))
-all(trcov(bouh_strat, c("0 1", "0 2"))[[1]] == trcov(bouh_female, c("0 1", "0 2")))
-all(trcov(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trcov(bouh_female, "0 1", c(0, 5, 10, 15)))
+    ## Test trcov
+    all(trcov(bouh_strat, "0 1")[[1]] == trcov(bouh_female, "0 1"))
+    all(trcov(bouh_strat, c("0 1", "0 2"))[[1]] == trcov(bouh_female, c("0 1", "0 2")))
+    all(trcov(bouh_strat, "0 1", c(0, 5, 10, 15))[[1]] == trcov(bouh_female, "0 1", c(0, 5, 10, 15)))
+} else {
+    print("These tests require the kmi package")
+}
 
 options(old)
