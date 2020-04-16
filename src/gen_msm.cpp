@@ -29,23 +29,11 @@ RcppExport SEXP gen_msm(SEXP _times,
 
     // ProfilerStart("/tmp/gen_msm.prof");
     
-    vec Tentry(__entry.begin(), __entry.size(), false);
-    vec Texit(__exit.begin(), __exit.size(), false);
-    ivec Tfrom(__from.begin(), __from.size(), false);
-    ivec Tto(__to.begin(), __to.size(), false);
+    vec entry(__entry.begin(), __entry.size(), false);
+    vec exit(__exit.begin(), __exit.size(), false);
+    ivec from(__from.begin(), __from.size(), false);
+    ivec to(__to.begin(), __to.size(), false);
     imat const_modif(__const_modif.begin(), __const_modif.nrow(), __const_modif.ncol(), false);
-    
-    // do some sorting
-    std::sort(times.begin(), times.end());
-    uvec ind_entry = sort_index(Tentry);
-    uvec ind_exit = sort_index(Texit);
-    
-    vec entry = Tentry.elem(ind_entry);
-    ivec from_entry = Tfrom.elem(ind_entry);
-    
-    vec exit = Texit.elem(ind_exit);
-    ivec to = Tto.elem(ind_exit);
-    ivec from_exit = Tfrom.elem(ind_exit);
     
     const int lt = times.size();
     const int n = entry.size();
@@ -57,80 +45,18 @@ RcppExport SEXP gen_msm(SEXP _times,
     cube nev(nstate, nstate, lt); nev.zeros();
     cube dna(nstate, nstate, lt); dna.zeros();
 
-
-    // the entries
-    int l = 0;
     for (int j = 0; j < n; ++j) {
-    	if (entry[j] < times[l]) {
-    	    nrisk(l, from_entry[j] - 1) += 1;
-    	} else {
-	    while (l < lt && entry[j] >= times[l] && entry[j] <= max(times)) {
-		++l;
+	for (int i = 0; i < lt; ++i) {
+	    if (entry[j] < times[i] && exit[j] >= times[i]) {
+		nrisk[i, from[j] - 1] += 1;
 	    }
-	    nrisk(l, from_entry[j] - 1) += 1;
-	}
-    }
-
-    // the events
-    int t = 0;
-
-    // only one event time. And different code paths if 1 data point
-    // or more
-    if (lt == 1) {
-	if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
-	if (n > 1) {
-	    for (int i = 1; i<n; ++i) {
-		if (exit[i] == exit[i - 1]) {
-		    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-		} else {
-		    break;
-		}
-	    }
-	}
-	
-    } else {
-
-	// A code path for first event(s) censored
-	int ii = 0;
-	while (to[ii] == 0) {
-	    nrisk(0, from_exit[ii] - 1) -= 1;
-	    ++ii;
-	}
-	
-	if (ii == 0) {
-	    if (to[0] != 0) nev(from_exit[0] - 1, to[0] - 1, 0) += 1;
-	    if (n > 1) {
-		nrisk(1, from_exit[0] - 1) -= 1;
-	    }
-	    ii = 1;
-	} else {
-	    if (to[ii] != 0) nev(from_exit[ii] - 1, to[ii] - 1, 0) += 1;
-	    nrisk(1, from_exit[ii] - 1) -= 1;
-	    ++ii;
-	}
-	
-	for (int i = ii; i<n; ++i) {
-	
-	    if (exit[i] == exit[i - 1]) {
-		if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-		if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
-	    } else {
-		if (t < lt - 1) {
-		    if (exit[i] == times[t+1]) {
-			++t;
-			if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-			if (t < lt - 1) nrisk(t + 1, from_exit[i] - 1) -= 1;
-		    } else {
-			nrisk(t + 1, from_exit[i] - 1) -= 1;
-		    }
-		}
-		else {
-		    if (exit[i] > times[t]) break;
-		    if (to[i] != 0) nev(from_exit[i] - 1, to[i] - 1, t) += 1;
-		}
+	    if (exit[j] == times[i] && to[j] != 0) {
+		nev[from[j] - 1, to[j] - 1, i] += 1;
+		break;
 	    }
 	}
     }
+
     mat y = cumsum(nrisk);
 
     irowvec cc = const_modif.row(0);
