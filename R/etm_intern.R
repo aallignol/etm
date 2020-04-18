@@ -14,7 +14,7 @@
                  covariance,
                  const_modif) {
 
-    times <- unique(exit[to != 0])
+    times <- sort(unique(exit[to != 0]))
     times <- times[times > s & times <= t]
 
     if (length(times) == 0) {
@@ -24,9 +24,9 @@
         zzz$n.risk <- zzz$time <- zzz$n.event <- NULL
         return(zzz)
     } else {
-        
+
         c_modif <- matrix(const_modif, length(times), nstate, byrow = TRUE)
-        
+
         zzz <- .Call("gen_msm", times, entry, exit, from, to, nstate, c_modif)
 
     }
@@ -41,9 +41,9 @@
                          zzz$dna)
 
         zzz$cov <- cov_etm
-        
+
     }
-    
+
     zzz
 }
-    
+

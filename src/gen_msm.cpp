@@ -1,8 +1,5 @@
 // #define ARMA_NO_DEBUG
 
-// pbl in the new stuff for "1" event: Probably
-// does something weird when last data point with ties
-
 #include <RcppArmadillo.h>
 // #include <gperftools/profiler.h>
 
@@ -40,24 +37,24 @@ RcppExport SEXP gen_msm(SEXP _times,
     const int nstate = Rcpp::as<int>(_nstate);
     
     // define the matrices we need
-    mat nrisk(lt, nstate, fill::zeros);
+    mat y(lt, nstate, fill::zeros);
     
     cube nev(nstate, nstate, lt); nev.zeros();
     cube dna(nstate, nstate, lt); dna.zeros();
 
     for (int j = 0; j < n; ++j) {
 	for (int i = 0; i < lt; ++i) {
-	    if (entry[j] < times[i] && exit[j] >= times[i]) {
-		nrisk[i, from[j] - 1] += 1;
+	    if (entry(j) < times(i) && exit(j) >= times(i)) {
+		y(i, from(j) - 1) += 1;
 	    }
-	    if (exit[j] == times[i] && to[j] != 0) {
-		nev[from[j] - 1, to[j] - 1, i] += 1;
+	    if (exit(j) == times(i) && to(j) != 0) {
+		nev(from(j) - 1, to(j) - 1, i) += 1;
 		break;
 	    }
 	}
     }
 
-    mat y = cumsum(nrisk);
+    // Rcpp::Rcout << "The value of y : \n" << y << "\n";
 
     irowvec cc = const_modif.row(0);
     if (any(cc)) {
